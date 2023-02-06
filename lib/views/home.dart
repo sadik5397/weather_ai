@@ -11,21 +11,26 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends State<Home>{
   final pController = PanelController();
+  double panelPosition = 0;
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SlidingUpPanel(
-        controller: pController,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        maxHeight: MediaQuery.of(context).size.height - 150,
-        minHeight: 200,
-        parallaxOffset: 0.5,
-        body: CurrentWeatherBigScreen(pController: pController),
-        panelBuilder: (controller) => WeatherDetail(controller: controller, pController: pController)
-      )
-    );
+        backgroundColor: const Color(0xff2D3259),
+        body: SlidingUpPanel(
+            parallaxEnabled: true,
+            color: Colors.transparent,
+            boxShadow: null,
+            controller: pController,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+            maxHeight: MediaQuery.of(context).size.height - 100,
+            minHeight: 220,
+            parallaxOffset: 0.25,
+            onPanelSlide: (position) => setState(() => panelPosition = position),
+            body: CurrentWeatherBigScreen(pController: pController, panelPosition: panelPosition),
+            panelBuilder: (controller) => WeatherDetail(controller: controller, pController: pController)));
   }
 }

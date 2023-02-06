@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'views/home.dart';
 
 void main() {
@@ -11,6 +10,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(debugShowCheckedModeBanner: false, title: 'Weather AI', theme: ThemeData(primarySwatch: Colors.blue), home: const Home());
+    return MaterialApp(debugShowCheckedModeBanner: false, title: 'Weather AI', theme: ThemeData(primarySwatch: Colors.blue, fontFamily: "Kanit", useMaterial3: true), home: const Home());
   }
 }
