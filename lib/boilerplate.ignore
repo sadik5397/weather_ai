@@ -1,0 +1,59 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import '../../api/api.dart';
+import '../../component/snackbar.dart';
+
+//Variables
+  String myPhoto = placeholderImage;
+String accessToken = "";
+  dynamic apiResult = {};
+
+
+//APIs
+  Future<void> __({required String accessToken}) async {
+    try {
+      var response = await http.get(Uri.parse("$baseUrl/__"), headers: authHeader(accessToken));
+      var response = await http.post(Uri.parse("$baseUrl/__"), headers: authHeader(accessToken),body: jsonEncode({"email": email});
+      Map result = jsonDecode(response.body);
+      print(result);
+      if (result["statusCode"] == 200 || result["statusCode"] == 201) {
+        if (kDebugMode) showSnackBar(context: context, label: result["message"]);
+        setState(() => apiResult = result["data"]);
+      }else{
+        showError(context: context, label: result["message"][0].toString().length==1 ? result["message"].toString() : result["message"][0].toString());
+     }
+    } on Exception catch (e) {
+      showError(context: context, label: e.toString());
+    }
+  }
+
+//Functions
+    Future<void> onRefresh() async {
+    await defaultInit();
+  } defaultInit() async {
+    final pref = await SharedPreferences.getInstance();
+    setState(() => accessToken = pref.getString("accessToken")!);
+    setState(() => myPhoto = pref.getString("myPhoto") ?? placeholderImage);
+  }
+
+//Initiate
+@override
+ void initState() {
+   super.initState();
+   defaultInit();
+ }
+
+
+----------------- Loading on Button --------------------
+  bool isLoading = false;
+  isLoading: isLoading,
+setState(() => isLoading = true);
+setState(() => isLoading = false);
+
+
+----------------- Keytool ------------------------------
+//facebook
+keytool -exportcert -alias androiddebugkey -keystore C:\Users\sadik\.android\debug.keystore | openssl sha1 -binary | openssl base64
+
+//google
+//keytool -list -v -alias androiddebugkey -keystore C:\Users\sadik\.android\debug.keystore

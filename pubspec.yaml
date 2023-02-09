@@ -39,6 +39,11 @@ dependencies:
   flutter_svg: ^1.1.6
   sliding_up_panel: ^2.0.0+1
   gauge_indicator: ^0.3.3
+  flutter_bounceable: ^1.1.0
+  http:
+  shared_preferences:
+  geolocator: ^9.0.2
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:
@@ -65,7 +70,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
-#    - assets/google_fonts/
+    - assets/google_fonts/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -78,27 +83,27 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-#  fonts:
-#    - family: Kanit
-#      fonts:
-#        - asset: assets/google_fonts/Kanit-Thin.ttf
-#          weight: 100
-#        - asset: assets/google_fonts/Kanit-ExtraLight.ttf
-#          weight: 200
-#        - asset: assets/google_fonts/Kanit-Light.ttf
-#          weight: 300
-#        - asset: assets/google_fonts/Kanit-Regular.ttf
-#          weight: 400
-#        - asset: assets/google_fonts/Kanit-Medium.ttf
-#          weight: 500
-#        - asset: assets/google_fonts/Kanit-SemiBold.ttf
-#          weight: 600
-#        - asset: assets/google_fonts/Kanit-Bold.ttf
-#          weight: 700
-#        - asset: assets/google_fonts/Kanit-ExtraBold.ttf
-#          weight: 800
-#        - asset: assets/google_fonts/Kanit-Black.ttf
-#          weight: 900
+  fonts:
+    - family: Kanit
+      fonts:
+        - asset: assets/google_fonts/Kanit-Thin.ttf
+          weight: 100
+        - asset: assets/google_fonts/Kanit-ExtraLight.ttf
+          weight: 200
+        - asset: assets/google_fonts/Kanit-Light.ttf
+          weight: 300
+        - asset: assets/google_fonts/Kanit-Regular.ttf
+          weight: 400
+        - asset: assets/google_fonts/Kanit-Medium.ttf
+          weight: 500
+        - asset: assets/google_fonts/Kanit-SemiBold.ttf
+          weight: 600
+        - asset: assets/google_fonts/Kanit-Bold.ttf
+          weight: 700
+        - asset: assets/google_fonts/Kanit-ExtraBold.ttf
+          weight: 800
+        - asset: assets/google_fonts/Kanit-Black.ttf
+          weight: 900
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
