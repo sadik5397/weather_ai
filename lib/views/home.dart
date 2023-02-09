@@ -11,10 +11,9 @@ class Home extends StatefulWidget {
   State<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home>{
+class _HomeState extends State<Home> {
   final pController = PanelController();
   double panelPosition = 0;
-
 
   @override
   Widget build(BuildContext context) {
@@ -27,10 +26,13 @@ class _HomeState extends State<Home>{
             controller: pController,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             maxHeight: MediaQuery.of(context).size.height - 100,
-            minHeight: 220,
+            minHeight: 280,
             parallaxOffset: 0.25,
             onPanelSlide: (position) => setState(() => panelPosition = position),
             body: CurrentWeatherBigScreen(pController: pController, panelPosition: panelPosition),
             panelBuilder: (controller) => WeatherDetail(controller: controller, pController: pController)));
   }
 }
+
+Future<dynamic> route(BuildContext context, Widget widget) => Navigator.push(context, MaterialPageRoute(builder: (context) => widget));
+dynamic routeBack(BuildContext context) => Navigator.pop(context);

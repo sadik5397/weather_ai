@@ -5,70 +5,44 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gauge_indicator/gauge_indicator.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
-class WeatherDetail extends StatefulWidget {
-  const WeatherDetail({Key? key, required this.controller, required this.pController}) : super(key: key);
-  final ScrollController controller;
-  final PanelController pController;
+class Locations extends StatefulWidget {
+  const Locations({Key? key}) : super(key: key);
 
   @override
-  State<WeatherDetail> createState() => _WeatherDetailState();
+  State<Locations> createState() => _LocationsState();
 }
 
-class _WeatherDetailState extends State<WeatherDetail> with SingleTickerProviderStateMixin {
-  togglePanel() => widget.pController.isPanelOpen ? widget.pController.close() : widget.pController.open();
-  late TabController tabController;
-
-  double angle = 0;
-
-  Future startDebug() async {
-    await Future.delayed(const Duration(milliseconds: 200));
-    setState(() => angle++);
-    // startDebug();
-  }
-
+class _LocationsState extends State<Locations> {
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 2, vsync: this);
-    startDebug();
   }
 
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return ClipRRect(
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        child: Stack(fit: StackFit.expand, children: [
-          BackdropFilter(filter: ImageFilter.blur(tileMode: TileMode.repeated, sigmaX: 15, sigmaY: 15), child: Container(decoration: BoxDecoration(color: Colors.white.withOpacity(.1)))),
-          Padding(
-              padding: const EdgeInsets.only(top: 2.5),
-              child: ClipRRect(borderRadius: const BorderRadius.vertical(top: Radius.circular(22)), child: BackdropFilter(filter: ImageFilter.blur(tileMode: TileMode.repeated, sigmaX: 15, sigmaY: 15), child: Container(decoration: BoxDecoration(color: const Color(0xff1b0f3b).withOpacity(.5)))))),
-          Column(children: [
-            InkWell(onTap: togglePanel, child: Center(child: Container(margin: const EdgeInsets.symmetric(vertical: 16), width: 40, height: 5, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(12))))),
-            TabBar(
-                indicator: UnderlineTabIndicator(borderSide: const BorderSide(strokeAlign: StrokeAlign.outside, width: 1, color: Colors.white), insets: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width / 3.5)),
-                controller: tabController,
-                tabs: const [Padding(padding: EdgeInsets.only(bottom: 6), child: Text("Hourly")), Padding(padding: EdgeInsets.only(bottom: 6), child: Text("Weekly"))],
-                indicatorPadding: const EdgeInsets.all(24).copyWith(bottom: 0)),
-            Expanded(
-                child: TabBarView(controller: tabController, children: [
-              SingleChildScrollView(
-                  child: Column(children: [
-                SingleChildScrollView(padding: const EdgeInsets.all(16).copyWith(bottom: 0), scrollDirection: Axis.horizontal, child: Row(children: List.generate(24, (index) => pill(selected: index == 3)))),
-                PaddedRow(children: [airQuality(value: 7, status: "Airing")]),
-                PaddedRow(children: [
-                  uvIndex(status: "Better", value: 2),
-                  sunLine(status: "06:47 PM", value: 100, size: size),
-                ]),
-                PaddedRow(children: [
-                  windSpeed(status: "Better", value: 2, direction: angle),
-                  sunLine(status: "06:47 PM", value: 100, size: size),
-                ]),
-              ])),
-              const FlutterLogo()
-            ]))
-          ])
-        ]));
+    return Container(
+      decoration: const BoxDecoration(gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xff2E335A), Color(0xff1C1B33)])),
+      child: Scaffold(
+          appBar: AppBar(title: const Text("Locations"), foregroundColor: Colors.white, backgroundColor: Colors.transparent),
+          backgroundColor: Colors.transparent,
+          body: ListView(children: [
+            SingleChildScrollView(padding: const EdgeInsets.all(16).copyWith(bottom: 0), scrollDirection: Axis.horizontal, child: Row(children: List.generate(24, (index) => pill(selected: index == 3)))),
+
+            SvgPicture.asset("assets/trapisium_tile.svg"),
+            FlutterLogo(),
+
+            PaddedRow(children: [airQuality(value: 7, status: "Airing")]),
+            PaddedRow(children: [
+              uvIndex(status: "Better", value: 2),
+              sunLine(status: "06:47 PM", value: 100, size: size),
+            ]),
+            PaddedRow(children: [
+              windSpeed(status: "Better", value: 2, direction: 0),
+              sunLine(status: "06:47 PM", value: 100, size: size),
+            ]),
+          ])),
+    );
   }
 
   Material pill({required bool selected}) {
