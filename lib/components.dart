@@ -10,6 +10,46 @@ Future<dynamic> route(BuildContext context, Widget widget) => Navigator.push(con
 
 dynamic routeBack(BuildContext context) => Navigator.pop(context);
 
+String weatherCodeToStatus(int weathercode) {
+  if (weathercode == 0) return "Clear Sky";
+  if (weathercode == 1) return "Mainly Clear";
+  if (weathercode == 2) return "Partly Cloudy";
+  if (weathercode == 3) return "Overcast";
+  if (weathercode == 45) return "Fog";
+  if (weathercode == 48) return "Depositing Rime Fog";
+  if (weathercode == 51) return "Light Drizzle";
+  if (weathercode == 53) return "Moderate Drizzle";
+  if (weathercode == 55) return "Dense Drizzle";
+  if (weathercode == 56) return "Light Freezing Drizzle";
+  if (weathercode == 57) return "Dense Freezing Drizzle";
+  if (weathercode == 61) return "Slight Rain";
+  if (weathercode == 63) return "Moderate Rain";
+  if (weathercode == 65) return "Heavy Rain";
+  if (weathercode == 66) return "Light Freezing Rain";
+  if (weathercode == 67) return "Heavy Freezing Rain";
+  if (weathercode == 71) return "Slight Snow Fall";
+  if (weathercode == 73) return "Moderate Snow Fall";
+  if (weathercode == 75) return "Heavy Snow Fall";
+  if (weathercode == 77) return "Snow Grains";
+  if (weathercode == 80) return "Slight Rain Showers";
+  if (weathercode == 81) return "Moderate Rain Showers";
+  if (weathercode == 82) return "Violent Rain Showers";
+  if (weathercode == 85) return "Slight Snow Showers";
+  if (weathercode == 86) return "Heavy Snow Showers";
+  if (weathercode == 95) return "Thunderstorm";
+  if (weathercode == 96) return "Slight Hail Thunderstorm";
+  if (weathercode == 99) return "Heavy Hail Thunderstorm";
+  return "Weather.ai";
+}
+
+String hrToHour(int hr) {
+  if (hr == 0) return "12 AM";
+  if (hr > 0 && hr < 12) return "$hr AM";
+  if (hr == 12) return "12 PM";
+  if (hr > 12 && hr < 24) return "${hr - 12} PM";
+  return "Weather.ai";
+}
+
 class CurrentTemp extends StatelessWidget {
   const CurrentTemp({Key? key, required this.location, required this.weather, required this.temp, required this.maxTemp, required this.minTemp}) : super(key: key);
   final String location;
@@ -23,7 +63,9 @@ class CurrentTemp extends StatelessWidget {
     return Column(children: [
       Text(location, style: const TextStyle(fontSize: 34, color: Colors.white, fontWeight: FontWeight.w300, height: 1.05), textAlign: TextAlign.center),
       Text("$temp°", style: const TextStyle(fontSize: 96, color: Colors.white, fontWeight: FontWeight.w100, height: 1.15), textAlign: TextAlign.center),
-      Text(weather, style: TextStyle(fontSize: 20, color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w400), textAlign: TextAlign.center),
+      SvgPicture.asset("assets/icons/$weather.svg", height: 72, fit: BoxFit.fitHeight),
+      Text(weather, style: TextStyle(fontSize: 18, color: Colors.white.withOpacity(.75), fontWeight: FontWeight.w400), textAlign: TextAlign.center),
+      const SizedBox(height: 6),
       Text("High: $maxTemp°  |  Low: $minTemp°", style: const TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.w400, height: 1.25), textAlign: TextAlign.center)
     ]);
   }
@@ -174,14 +216,15 @@ class WindSpeed extends StatelessWidget {
               height: 110,
               width: 110,
               child: Stack(alignment: Alignment.center, children: [
-                SizedBox(width: 116, height: 116, child: CircularProgressIndicator(value: 1, strokeWidth: 2, color: Colors.white.withOpacity(.5))),
+                // SizedBox(width: 116, height: 116, child: CircularProgressIndicator(value: 1, strokeWidth: 2, color: Colors.white.withOpacity(.5))),
+                SizedBox(width: 116, height: 116, child: SvgPicture.asset("assets/compass.svg")),
                 Transform.rotate(
                     angle: (direction - 90) * ((2 * 3.1415926535897932) / 360),
                     child: Center(
                         child: Row(children: [
-                      const Spacer(flex: 8),
+                      const Spacer(flex: 10),
                       Expanded(flex: 3, child: Container(height: 6, decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.white))),
-                      const Spacer()
+                      const Spacer(flex: 2)
                     ]))),
                 Text(direction.toInt().toString(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400))
               ])))
@@ -263,7 +306,7 @@ class TemperaturePill extends StatelessWidget {
                         boxShadow: [BoxShadow(color: const Color(0xff000000).withOpacity(.25), offset: const Offset(0, 10), spreadRadius: 0, blurRadius: 8)]),
                     child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                       Text(dateOrTime, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 17)),
-                      const FlutterLogo(),
+                      SvgPicture.asset("assets/icons/${weatherCodeToStatus(weatherCode)}.svg", height: 48, fit: BoxFit.fitHeight),
                       Text("${avgTemp.toStringAsFixed(1)}°", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 22, height: 1))
                     ])))));
   }
