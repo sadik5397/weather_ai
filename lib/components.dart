@@ -42,6 +42,15 @@ String weatherCodeToStatus(int weathercode) {
   return "Weather.ai";
 }
 
+String airPollutionCodeToStatus(int airPollutionCode) {
+  if (airPollutionCode == 1) return "Good";
+  if (airPollutionCode == 2) return "Fair";
+  if (airPollutionCode == 3) return "Moderate";
+  if (airPollutionCode == 4) return "Poor";
+  if (airPollutionCode == 5) return "Violent";
+  return "Undefined";
+}
+
 String hrToHour(int hr) {
   if (hr == 0) return "12 AM";
   if (hr > 0 && hr < 12) return "$hr AM";
@@ -72,32 +81,32 @@ class CurrentTemp extends StatelessWidget {
 }
 
 class ContainerBox extends StatelessWidget {
-  const ContainerBox({Key? key, required this.children, this.width, this.onTap, this.height}) : super(key: key);
+  const ContainerBox({Key? key, required this.children, this.width, this.onTap, this.height, required this.tooltipInfo}) : super(key: key);
   final List<Widget> children;
   final double? width;
   final double? height;
+  final String tooltipInfo;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-        child: Material(
-            color: Colors.transparent,
-            child: Padding(
-                padding: const EdgeInsets.all(8),
-                child: InkWell(
-                    splashColor: Colors.black.withOpacity(.25),
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: onTap,
-                    child: Container(
-                        padding: const EdgeInsets.all(20),
-                        width: width == null ? null : width! - 16,
-                        height: height == null ? 190 : height! - 16,
-                        decoration: BoxDecoration(
-                            color: const Color(0xff2D2258).withOpacity(.5),
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: Colors.white.withOpacity(.2), width: 1, strokeAlign: StrokeAlign.inside)),
-                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: children))))));
+        child: Tooltip(
+      message: tooltipInfo,
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      enableFeedback: true,
+      showDuration: const Duration(seconds: 5),
+      verticalOffset: -80,
+      textAlign: TextAlign.center,
+      child: Container(
+          margin: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(20),
+          width: width == null ? null : width! - 16,
+          height: height == null ? 190 : height! - 16,
+          decoration: BoxDecoration(
+              color: const Color(0xff2D2258).withOpacity(.5), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white.withOpacity(.2), width: 1, strokeAlign: StrokeAlign.inside)),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: children)),
+    ));
   }
 }
 
@@ -164,21 +173,60 @@ class LocationTile extends StatelessWidget {
 }
 
 class AirQuality extends StatelessWidget {
-  const AirQuality({Key? key, required this.value, required this.status}) : super(key: key);
+  const AirQuality({Key? key, required this.value, required this.components}) : super(key: key);
   final int value;
-  final String status;
+  final Map components;
 
   @override
   Widget build(BuildContext context) {
-    return ContainerBox(children: [
-      Text("Air Quality", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
-      const Spacer(flex: 2),
-      Text(value.toString(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 42, height: 1)),
-      Text(status, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 22)),
-      const Spacer(flex: 2),
-      ColorfulIndicatorBar(value: value, maxValue: 10),
-      const Spacer()
-    ]);
+    return ContainerBox(
+        tooltipInfo:
+            "Besides basic Air Quality Index, you can see data about polluting gases, such as Carbon monoxide (CO), Nitrogen monoxide (NO), Nitrogen dioxide (NO2), Ozone (O3), Sulphur dioxide (SO2), Ammonia "
+            "(NH3), and particulates (PM2.5 and PM10).",
+        children: [
+          Text("Air Quality", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
+          const Spacer(flex: 2),
+          Row(children: [
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(value.toString(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 42, height: 1)),
+              Text(airPollutionCodeToStatus(value), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 22))
+            ]),
+            Container(height: 72, width: 1, color: Colors.white, margin: const EdgeInsets.symmetric(horizontal: 12)),
+            Expanded(
+                child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(children: [
+                      AirComponents(value: components["co"], gas: "CO"),
+                      AirComponents(value: components["no"], gas: "NO"),
+                      AirComponents(value: components["no2"], gas: "NO₂"),
+                      AirComponents(value: components["o3"], gas: "O₃"),
+                      AirComponents(value: components["so2"], gas: "SO₂"),
+                      AirComponents(value: components["pm2_5"], gas: "PM₂.₅"),
+                      AirComponents(value: components["pm10"], gas: "PM₁₀"),
+                      AirComponents(value: components["nh3"], gas: "NH₃")
+                    ])))
+          ]),
+          const Spacer(flex: 2),
+          ColorfulIndicatorBar(value: value, maxValue: 5),
+          const Spacer()
+        ]);
+  }
+}
+
+class AirComponents extends StatelessWidget {
+  const AirComponents({Key? key, required this.value, required this.gas}) : super(key: key);
+  final num value;
+  final String gas;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.only(right: 10),
+        child: Column(children: [
+          CircleAvatar(radius: 18, backgroundColor: Colors.white.withOpacity(.15), child: Text(gas, style: const TextStyle(color: Colors.white))),
+          const SizedBox(height: 4),
+          Text(value.toString(), textScaleFactor: .8)
+        ]));
   }
 }
 
@@ -189,7 +237,7 @@ class UvIndex extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ContainerBox(children: [
+    return ContainerBox(tooltipInfo: "Besides bas", children: [
       Text("UV Index", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
       const Spacer(flex: 2),
       Text(value.toString(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 42, height: 1)),
@@ -201,34 +249,118 @@ class UvIndex extends StatelessWidget {
   }
 }
 
-class WindSpeed extends StatelessWidget {
-  const WindSpeed({Key? key, required this.value, required this.direction, required this.status}) : super(key: key);
-  final double value;
-  final double direction;
-  final String status;
+class Humidity extends StatelessWidget {
+  const Humidity({Key? key, required this.hum, required this.dewPoint}) : super(key: key);
+  final num hum, dewPoint;
 
   @override
   Widget build(BuildContext context) {
-    return ContainerBox(children: [
-      Text("Wind: $value KM/h", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
-      Center(
-          child: SizedBox(
-              height: 110,
-              width: 110,
-              child: Stack(alignment: Alignment.center, children: [
-                // SizedBox(width: 116, height: 116, child: CircularProgressIndicator(value: 1, strokeWidth: 2, color: Colors.white.withOpacity(.5))),
-                SizedBox(width: 116, height: 116, child: SvgPicture.asset("assets/compass.svg")),
-                Transform.rotate(
-                    angle: (direction - 90) * ((2 * 3.1415926535897932) / 360),
-                    child: Center(
-                        child: Row(children: [
-                      const Spacer(flex: 10),
-                      Expanded(flex: 3, child: Container(height: 6, decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.white))),
-                      const Spacer(flex: 2)
-                    ]))),
-                Text(direction.toInt().toString(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400))
-              ])))
+    return ContainerBox(tooltipInfo: "Besides bas", children: [
+      Text("Rel. Humidity", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
+      const Spacer(flex: 2),
+      Text('$hum%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 42, height: 1)),
+      const Spacer(),
+      ColorfulIndicatorBar(value: hum.toInt(), maxValue: 100),
+      const Spacer(flex: 2),
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Text("Dew Point", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1.5)),
+        Text('${dewPoint.toString()}°C', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 22, height: 1))
+      ])
     ]);
+  }
+}
+
+class FeelsLike extends StatelessWidget {
+  const FeelsLike({Key? key, required this.current, required this.max, required this.min, required this.temp}) : super(key: key);
+  final num temp, current, max, min;
+
+  @override
+  Widget build(BuildContext context) {
+    return ContainerBox(tooltipInfo: "Besides bas", children: [
+      Text("Feels Like", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
+      const Spacer(flex: 2),
+      Text('$current°C', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 42, height: 1)),
+      Text("(${(current - temp).toStringAsFixed(2)}°C higher)", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1.5)),
+      const Spacer(flex: 3),
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text("Today's Min: $min°C", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1.5)),
+        Text('Max: $max°C', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 22, height: 1))
+      ])
+    ]);
+  }
+}
+
+class WindSpeed extends StatelessWidget {
+  const WindSpeed(
+      {Key? key,
+      required this.value0,
+      required this.direction0,
+      required this.value10,
+      required this.value80,
+      required this.value120,
+      required this.value180,
+      required this.direction10,
+      required this.direction80,
+      required this.direction120,
+      required this.direction180})
+      : super(key: key);
+  final num value0, value10, value80, value120, value180, direction0, direction10, direction80, direction120, direction180;
+
+  @override
+  Widget build(BuildContext context) {
+    return ContainerBox(tooltipInfo: "Besides bas", children: [
+      Text("Wind: $value0 KM/h", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
+      Row(children: [
+        SizedBox(
+            height: 110,
+            width: 110,
+            child: Stack(alignment: Alignment.center, children: [
+              SizedBox(width: 116, height: 116, child: SvgPicture.asset("assets/compass.svg")),
+              Transform.rotate(
+                  angle: (direction0 - 90) * ((2 * 3.1415926535897932) / 360),
+                  child: Center(
+                      child: Row(children: [
+                    const Spacer(flex: 10),
+                    Expanded(flex: 3, child: Container(height: 6, decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.white))),
+                    const Spacer(flex: 2)
+                  ]))),
+              Text('${direction0.toInt().toString()}°', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400))
+            ])),
+        Expanded(
+            child: Stack(alignment: Alignment.center, children: [
+          Container(
+              margin: EdgeInsets.only(left: 6),
+              height: 120,
+              decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.white.withOpacity(0), Colors.white.withOpacity(.1)]))),
+          Column(
+              children: [
+            WindSpeedAtHeight(height: 0, speed: value0, direction: direction0),
+            WindSpeedAtHeight(height: 10, speed: value10, direction: direction10),
+            WindSpeedAtHeight(height: 80, speed: value80, direction: direction80),
+            WindSpeedAtHeight(height: 120, speed: value120, direction: direction120),
+            WindSpeedAtHeight(height: 180, speed: value180, direction: direction180)
+          ].reversed.toList())
+        ]))
+      ])
+    ]);
+  }
+}
+
+class WindSpeedAtHeight extends StatelessWidget {
+  const WindSpeedAtHeight({Key? key, required this.height, required this.speed, required this.direction}) : super(key: key);
+  final num height, speed, direction;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.fromLTRB(12, 3, 0, 3),
+        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          Image.asset("assets/png/fog.png", height: 16),
+          Expanded(child: Text("  ${height}m :", textScaleFactor: .9)),
+          Text("$speed km/h ", textScaleFactor: .9),
+          Transform.rotate(angle: direction * ((2 * 3.1415926535897932) / 360), child: const Icon(Icons.navigation_rounded, size: 16)),
+          Text("  $direction° ", textScaleFactor: .9)
+        ]));
   }
 }
 
@@ -241,7 +373,7 @@ class SunLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(alignment: Alignment.bottomCenter, children: [
-      ContainerBox(height: 190 + 16, width: size.width / 2 - 12, children: [
+      ContainerBox(tooltipInfo: "Besides bas", height: 190 + 16, width: size.width / 2 - 12, children: [
         Text("Sunrise", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
         const Spacer(flex: 3),
         const Align(alignment: Alignment.center, child: Text("04:12 AM", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 17), textAlign: TextAlign.center)),

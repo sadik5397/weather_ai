@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../components.dart';
@@ -16,8 +17,7 @@ class WeatherDetail extends StatefulWidget {
       required this.hourlyTimes,
       required this.hourlyTemp,
       required this.hourlyWeatherCode,
-      required this.weatherDetails,
-      required this.optionalData})
+      required this.weatherDetails})
       : super(key: key);
   final ScrollController controller;
   final PanelController pController;
@@ -30,8 +30,7 @@ class WeatherDetail extends StatefulWidget {
   final List hourlyTimes;
   final List hourlyTemp;
   final List hourlyWeatherCode;
-  final List<Map<String, dynamic>> weatherDetails;
-  final Map optionalData;
+  final Map weatherDetails;
 
   @override
   State<WeatherDetail> createState() => _WeatherDetailState();
@@ -70,11 +69,29 @@ class _WeatherDetailState extends State<WeatherDetail> with SingleTickerProvider
         pController: widget.pController,
         tabController: tabController,
         children: [
-          Column(children: List.generate(widget.weatherDetails.length, (index) => Text("${widget.weatherDetails[index].keys}: ${widget.weatherDetails[index].values}"))),
-          Text(widget.optionalData.toString()),
-          const PaddedRow(children: [AirQuality(value: 7, status: "Airing")]),
-          PaddedRow(children: [const UvIndex(status: "Better", value: 2), SunLine(status: "06:47 PM", value: 100, size: size)]),
-          PaddedRow(children: [const WindSpeed(status: "Better", value: 2, direction: 0), SunLine(status: "06:47 PM", value: 100, size: size)])
+          if(kDebugMode) SelectableText(widget.weatherDetails.toString().replaceAll("{", "").replaceAll("}", "").replaceAll(", ", "\n")),
+          PaddedRow(children: [AirQuality(value: widget.weatherDetails["aq_index"], components: widget.weatherDetails["aqi_components"])]),
+          PaddedRow(children: [
+            Humidity(hum: widget.weatherDetails["relativehumidity_2m"], dewPoint: widget.weatherDetails["dewpoint_2m"]),
+            FeelsLike(
+                temp: widget.weatherDetails["actual_temperature"],
+                current: widget.weatherDetails["apparent_temperature"],
+                max: widget.weatherDetails["apparent_temperature_max"],
+                min: widget.weatherDetails["apparent_temperature_min"])
+          ]),
+          PaddedRow(children: [
+            WindSpeed(
+                value0: widget.weatherDetails["windspeed_0m"],
+                value10: widget.weatherDetails["windspeed_10m"],
+                value80: widget.weatherDetails["windspeed_80m"],
+                value120: widget.weatherDetails["windspeed_120m"],
+                value180: widget.weatherDetails["windspeed_180m"],
+                direction0: widget.weatherDetails["winddirection_0m"],
+                direction10: widget.weatherDetails["winddirection_10m"],
+                direction80: widget.weatherDetails["winddirection_80m"],
+                direction120: widget.weatherDetails["winddirection_120m"],
+                direction180: widget.weatherDetails["winddirection_180m"])
+          ])
         ]);
   }
 }
