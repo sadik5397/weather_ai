@@ -207,7 +207,7 @@ class _HomeState extends State<Home> {
                 country: country,
                 address: address,
                 time: currentWeather["time"].toString().replaceAll("T", " at "),
-                weather: weatherCodeToStatus(currentWeather["weathercode"]),
+                weather: currentWeather.isEmpty ? "Loading...": weatherCodeToStatus(currentWeather["weathercode"]),
                 temp: currentWeather["temperature"] ?? 0,
                 maxTemp: todayWeather["temperature_2m_max"] == null ? 0 : todayWeather["temperature_2m_max"][0],
                 minTemp: todayWeather["temperature_2m_min"] == null ? 0 : todayWeather["temperature_2m_min"][0]),

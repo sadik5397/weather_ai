@@ -12,3 +12,4 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false, title: 'Weather AI', theme: ThemeData(brightness: Brightness.dark, primarySwatch: Colors.blue, fontFamily: "Kanit", useMaterial3: true), home: const Home());
   }
 }
+
