@@ -43,14 +43,12 @@ class _HomeState extends State<Home> {
     var response = await http.get(Uri.parse("https://api.opencagedata.com/geocode/v1/json?key=0aabe27b107d496db971d4aa5acad6c0&q=$lat,$lng&limit=1&address_only=1&no_annotations=1"));
     Map result = jsonDecode(response.body);
     setState(() => address = '${result["results"][0]["formatted"]}');
-    setState(() => location =
-        result["results"][0]["formatted"].toString().split(", ").length > 1 ? result["results"][0]["formatted"].toString().split(", ")[1] : result["results"][0]["formatted"].toString().split(", ")[0]);
+    setState(() => location = result["results"][0]["formatted"].toString().split(", ").length > 1 ? result["results"][0]["formatted"].toString().split(", ")[1] : result["results"][0]["formatted"].toString().split(", ")[0]);
     setState(() => country = result["results"][0]["formatted"].toString().split(", ")[result["results"][0]["formatted"].toString().split(",").length - 1]);
   }
 
   Future<void> getCurrentWeather({required double lat, required double lng, required int currentHour, required String date}) async {
-    var response = await http.get(Uri.parse(
-        "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lng&current_weather=true&temperature_unit=celsius&windspeed_unit=kmh&precipitation_unit=mm&timeformat=iso8601&timezone=auto&hourly=cloudcover,"
+    var response = await http.get(Uri.parse("https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lng&current_weather=true&temperature_unit=celsius&windspeed_unit=kmh&precipitation_unit=mm&timeformat=iso8601&timezone=auto&hourly=cloudcover,"
         "relativehumidity_2m,dewpoint_2m,apparent_temperature,surface_pressure,cloudcover_high,cloudcover_mid,cloudcover_low,windspeed_10m,windspeed_80m,windspeed_120m,windspeed_180m,winddirection_10m,"
         "winddirection_80m,winddirection_120m,winddirection_180m,shortwave_radiation,direct_radiation,direct_normal_irradiance,diffuse_radiation,cape,evapotranspiration,precipitation,snowfall,rain,"
         "showers,snow_depth,visibility,soil_temperature_0cm,soil_moisture_0_1cm,temperature_2m,weathercode&start_date=$date"
@@ -75,12 +73,13 @@ class _HomeState extends State<Home> {
           "precipitation_sum": todayWeather["precipitation_sum"] == null ? "" : todayWeather["precipitation_sum"][0],
           "snowfall": result["hourly"]["snowfall"][currentHour],
           "snowfall_sum": todayWeather["snowfall_sum"] == null ? "" : todayWeather["snowfall_sum"][0],
-          "rain": result["hourly"]["rain"][currentHour], "rain_sum": todayWeather["rain_sum"] == null ? "" : todayWeather["rain_sum"][0],
+          "rain": result["hourly"]["rain"][currentHour],
+          "rain_sum": todayWeather["rain_sum"] == null ? "" : todayWeather["rain_sum"][0],
           "showers": result["hourly"]["showers"][currentHour],
           "showers_sum": todayWeather["showers_sum"] == null ? "" : todayWeather["showers_sum"][0],
 
           //Feels Like
-          "actual_temperature" : result["current_weather"]["temperature"],
+          "actual_temperature": result["current_weather"]["temperature"],
           "apparent_temperature": result["hourly"]["apparent_temperature"][currentHour],
           "apparent_temperature_max": todayWeather["apparent_temperature_max"] == null ? "" : todayWeather["apparent_temperature_max"][0],
           "apparent_temperature_min": todayWeather["apparent_temperature_min"] == null ? "" : todayWeather["apparent_temperature_min"][0],
@@ -122,7 +121,6 @@ class _HomeState extends State<Home> {
           //Others
           "evapotranspiration": result["hourly"]["evapotranspiration"][currentHour],
           "surface_pressure": result["hourly"]["surface_pressure"][currentHour],
-
           "snow_depth": result["hourly"]["snow_depth"][currentHour],
           "visibility": result["hourly"]["visibility"][currentHour],
         });
@@ -130,9 +128,8 @@ class _HomeState extends State<Home> {
 
   Future<void> getHourlyAndWeekly({required double lat, required double lng}) async {
     List temp = [];
-    var response = await http
-        .get(Uri.parse("https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lng&temperature_unit=celsius&windspeed_unit=kmh&precipitation_unit=mm&timeformat=iso8601&timezone=auto&past_days=2&daily"
-            "=temperature_2m_max,temperature_2m_min,weathercode&hourly=temperature_2m,weathercode"));
+    var response = await http.get(Uri.parse("https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lng&temperature_unit=celsius&windspeed_unit=kmh&precipitation_unit=mm&timeformat=iso8601&timezone=auto&past_days=2&daily"
+        "=temperature_2m_max,temperature_2m_min,weathercode&hourly=temperature_2m,weathercode"));
     Map result = jsonDecode(response.body);
     Map hourly = result["hourly"];
     temp = [];

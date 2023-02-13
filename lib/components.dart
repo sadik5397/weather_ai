@@ -103,8 +103,7 @@ class ContainerBox extends StatelessWidget {
           padding: const EdgeInsets.all(20),
           width: width == null ? null : width! - 16,
           height: height == null ? 190 : height! - 16,
-          decoration: BoxDecoration(
-              color: const Color(0xff2D2258).withOpacity(.5), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white.withOpacity(.2), width: 1, strokeAlign: StrokeAlign.inside)),
+          decoration: BoxDecoration(color: const Color(0xff2D2258).withOpacity(.5), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white.withOpacity(.2), width: 1, strokeAlign: StrokeAlign.inside)),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: children)),
     ));
   }
@@ -118,11 +117,8 @@ class ColorfulIndicatorBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(alignment: Alignment.center, children: [
-      Container(
-          height: 6,
-          decoration:
-              BoxDecoration(borderRadius: BorderRadius.circular(12), gradient: const LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [Color(0xff3759B1), Color(0xffE74395)]))),
-      Row(children: [Spacer(flex: value), const CircleAvatar(radius: 7, backgroundColor: Colors.white), Spacer(flex: maxValue - value + 1)])
+      Container(height: 6, decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), gradient: const LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [Color(0xff3759B1), Color(0xffE74395)]))),
+      Row(children: [Spacer(flex: value + 1), const CircleAvatar(radius: 7, backgroundColor: Colors.white), Spacer(flex: maxValue - value + 1)])
     ]);
   }
 }
@@ -163,10 +159,7 @@ class LocationTile extends StatelessWidget {
                       Text("Time - $time", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w400, fontSize: 17)),
                       Text(location, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 17, height: 1))
                     ]),
-                    Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [const FlutterLogo(size: 94), const SizedBox(height: 16), Text(weather, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 17, height: 1))])
+                    Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.end, children: [const FlutterLogo(size: 94), const SizedBox(height: 16), Text(weather, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 17, height: 1))])
                   ]))
             ])));
   }
@@ -180,17 +173,15 @@ class AirQuality extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ContainerBox(
-        tooltipInfo:
-            "Besides basic Air Quality Index, you can see data about polluting gases, such as Carbon monoxide (CO), Nitrogen monoxide (NO), Nitrogen dioxide (NO2), Ozone (O3), Sulphur dioxide (SO2), Ammonia "
+        tooltipInfo: "Besides basic Air Quality Index, you can see data about polluting gases, such as Carbon monoxide (CO), Nitrogen monoxide (NO), Nitrogen dioxide (NO2), Ozone (O3), Sulphur dioxide (SO2), Ammonia "
             "(NH3), and particulates (PM2.5 and PM10).",
         children: [
           Text("Air Quality", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
           const Spacer(flex: 2),
           Row(children: [
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(value.toString(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 42, height: 1)),
-              Text(airPollutionCodeToStatus(value), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 22))
-            ]),
+            Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [Text(value.toString(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 42, height: 1)), Text(airPollutionCodeToStatus(value), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 22))]),
             Container(height: 72, width: 1, color: Colors.white, margin: const EdgeInsets.symmetric(horizontal: 12)),
             Expanded(
                 child: SingleChildScrollView(
@@ -220,31 +211,53 @@ class AirComponents extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-        padding: const EdgeInsets.only(right: 10),
-        child: Column(children: [
-          CircleAvatar(radius: 18, backgroundColor: Colors.white.withOpacity(.15), child: Text(gas, style: const TextStyle(color: Colors.white))),
-          const SizedBox(height: 4),
-          Text(value.toString(), textScaleFactor: .8)
-        ]));
+    return Padding(padding: const EdgeInsets.only(right: 10), child: Column(children: [CircleAvatar(radius: 18, backgroundColor: Colors.white.withOpacity(.15), child: Text(gas, style: const TextStyle(color: Colors.white))), const SizedBox(height: 4), Text(value.toString(), textScaleFactor: .8)]));
   }
 }
 
-class UvIndex extends StatelessWidget {
-  const UvIndex({Key? key, required this.value, required this.status}) : super(key: key);
-  final int value;
-  final String status;
+class Precipitation extends StatelessWidget {
+  const Precipitation({Key? key, required this.value, required this.valueSum, required this.snowfall, required this.snowfallSum, required this.rain, required this.rainSum, required this.shower, required this.showerSum}) : super(key: key);
+  final num? value, valueSum, snowfall, snowfallSum, rain, rainSum, shower, showerSum;
 
   @override
   Widget build(BuildContext context) {
-    return ContainerBox(tooltipInfo: "Besides bas", children: [
-      Text("UV Index", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
+    return ContainerBox(height: 460, tooltipInfo: "Besides bas", children: [
+      Text("Precipitation", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
       const Spacer(flex: 2),
-      Text(value.toString(), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 42, height: 1)),
-      Text(status, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 22)),
+      Text('$value%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 42, height: 1)),
+      const Spacer(),
+      ColorfulIndicatorBar(value: value!.toInt(), maxValue: 100),
       const Spacer(flex: 2),
-      ColorfulIndicatorBar(value: value, maxValue: 10),
-      const Spacer()
+      Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [const Text("Today's Total", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1.5)), Text('$valueSum%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 22, height: 1))]),
+      const Spacer(),
+      PrecipitationComponent(current: rain ?? 0, sum: rainSum ?? 0, component: "Rain"),
+      PrecipitationComponent(current: snowfall ?? 0, sum: snowfallSum ?? 0, component: "Snowfall"),
+      PrecipitationComponent(current: shower ?? 0, sum: showerSum ?? 0, component: "Shower"),
+    ]);
+  }
+}
+
+class PrecipitationComponent extends StatelessWidget {
+  const PrecipitationComponent({Key? key, required this.current, required this.sum, required this.component}) : super(key: key);
+  final num current, sum;
+  final String component;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+      const Divider(color: Colors.white),
+      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center, children: [
+        Image.asset("assets/png/${component.toLowerCase()}.png", width: 40, fit: BoxFit.fitWidth),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Text("Current $component", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1.25)),
+            Text('$current%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 24, height: 1.25)),
+            Text('Total: $sum%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1.25))
+          ]),
+        )
+      ])
     ]);
   }
 }
@@ -262,10 +275,70 @@ class Humidity extends StatelessWidget {
       const Spacer(),
       ColorfulIndicatorBar(value: hum.toInt(), maxValue: 100),
       const Spacer(flex: 2),
-      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        const Text("Dew Point", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1.5)),
-        Text('${dewPoint.toString()}°C', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 22, height: 1))
-      ])
+      Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [const Text("Dew Point", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1.5)), Text('${dewPoint.toString()}°C', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 22, height: 1))])
+    ]);
+  }
+}
+
+class SoilTemperature extends StatelessWidget {
+  const SoilTemperature({Key? key, required this.temp, required this.moist, required this.screenSize}) : super(key: key);
+  final num temp, moist;
+  final Size screenSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        height: 164,
+        width: screenSize.width / 2 - 10,
+        child: ContainerBox(tooltipInfo: "Besides bas", children: [
+          Text("Soil Temperature", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
+          const Spacer(flex: 2),
+          Row(children: [const Padding(padding: EdgeInsets.only(right: 8, top: 4), child: Icon(Icons.grass_rounded, color: Colors.white, size: 20)), Text('$temp°C', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 42, height: 1))]),
+          const Spacer(flex: 2),
+          RadiationComponent(value: moist, component: "Soil Moisture"),
+        ]));
+  }
+}
+
+class CloudCover extends StatelessWidget {
+  const CloudCover({Key? key, required this.value, required this.low, required this.mid, required this.high, required this.screenSize}) : super(key: key);
+  final num value, low, mid, high;
+  final Size screenSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+        height: 320,
+        width: screenSize.width / 2 - 10,
+        child: ContainerBox(tooltipInfo: "Besides bas", children: [
+          Text("Cloud Cover", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
+          const Spacer(flex: 2),
+          Row(children: [Padding(padding: const EdgeInsets.only(right: 8, top: 4), child: Icon(Icons.cloud, color: Colors.white.withOpacity(value / 100), size: 20)), Text('$value%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 42, height: 1))]),
+          const Spacer(),
+          ColorfulIndicatorBar(value: value.toInt(), maxValue: 100),
+          const Spacer(flex: 2),
+          CloudCoverComponent(value: low, component: "Low"),
+          CloudCoverComponent(value: mid, component: "Mid"),
+          CloudCoverComponent(value: high, component: "High"),
+        ]));
+  }
+}
+
+class CloudCoverComponent extends StatelessWidget {
+  const CloudCoverComponent({Key? key, required this.value, required this.component}) : super(key: key);
+  final num value;
+  final String component;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+      const Divider(color: Colors.white),
+      Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [Text(component, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 18, height: 1.25)), Text('$value%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 24, height: 1.25))]),
     ]);
   }
 }
@@ -282,28 +355,15 @@ class FeelsLike extends StatelessWidget {
       Text('$current°C', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 42, height: 1)),
       Text("(${(current - temp).toStringAsFixed(2)}°C higher)", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1.5)),
       const Spacer(flex: 3),
-      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text("Today's Min: $min°C", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1.5)),
-        Text('Max: $max°C', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 22, height: 1))
-      ])
+      Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [Text("Today's Min: $min°C", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1.5)), Text('Max: $max°C', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 22, height: 1))])
     ]);
   }
 }
 
 class WindSpeed extends StatelessWidget {
-  const WindSpeed(
-      {Key? key,
-      required this.value0,
-      required this.direction0,
-      required this.value10,
-      required this.value80,
-      required this.value120,
-      required this.value180,
-      required this.direction10,
-      required this.direction80,
-      required this.direction120,
-      required this.direction180})
-      : super(key: key);
+  const WindSpeed({Key? key, required this.value0, required this.direction0, required this.value10, required this.value80, required this.value120, required this.value180, required this.direction10, required this.direction80, required this.direction120, required this.direction180}) : super(key: key);
   final num value0, value10, value80, value120, value180, direction0, direction10, direction80, direction120, direction180;
 
   @override
@@ -318,20 +378,12 @@ class WindSpeed extends StatelessWidget {
               SizedBox(width: 116, height: 116, child: SvgPicture.asset("assets/compass.svg")),
               Transform.rotate(
                   angle: (direction0 - 90) * ((2 * 3.1415926535897932) / 360),
-                  child: Center(
-                      child: Row(children: [
-                    const Spacer(flex: 10),
-                    Expanded(flex: 3, child: Container(height: 6, decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.white))),
-                    const Spacer(flex: 2)
-                  ]))),
+                  child: Center(child: Row(children: [const Spacer(flex: 10), Expanded(flex: 3, child: Container(height: 6, decoration: BoxDecoration(borderRadius: BorderRadius.circular(12), color: Colors.white))), const Spacer(flex: 2)]))),
               Text('${direction0.toInt().toString()}°', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400))
             ])),
         Expanded(
             child: Stack(alignment: Alignment.center, children: [
-          Container(
-              margin: EdgeInsets.only(left: 6),
-              height: 120,
-              decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.white.withOpacity(0), Colors.white.withOpacity(.1)]))),
+          Container(margin: const EdgeInsets.only(left: 6), height: 120, decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.white.withOpacity(0), Colors.white.withOpacity(.1)]))),
           Column(
               children: [
             WindSpeedAtHeight(height: 0, speed: value0, direction: direction0),
@@ -364,6 +416,61 @@ class WindSpeedAtHeight extends StatelessWidget {
   }
 }
 
+class SolarRadiation extends StatelessWidget {
+  const SolarRadiation({Key? key, required this.shortWaveRad, required this.shortWaveRadSum, required this.directRad, required this.directNorIrr, required this.diffRad, required this.cape}) : super(key: key);
+  final num shortWaveRad, shortWaveRadSum, directRad, directNorIrr, diffRad, cape;
+
+  @override
+  Widget build(BuildContext context) {
+    return ContainerBox(height: 214, tooltipInfo: "Besides bas", children: [
+      Text("Shortwave Solar Radiation", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
+      Row(children: [
+        Stack(children: [
+          Opacity(opacity: .15, child: Image.asset("assets/png/planet.png", width: 110, fit: BoxFit.fitWidth)),
+          SizedBox(
+              height: 124,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const Spacer(flex: 2),
+                const Text('Current', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1)),
+                Text('$shortWaveRad%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 42, height: 1)),
+                const Spacer(flex: 2),
+                const Text("Today's Total", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1.5)),
+                Text('$shortWaveRadSum%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 22, height: 1)),
+                const Spacer()
+              ]))
+        ]),
+        Container(height: 100, width: 1, color: Colors.white, margin: const EdgeInsets.symmetric(horizontal: 12)),
+        Expanded(
+            child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          RadiationComponent(value: directRad, component: "Direct Radiation", bar: false),
+          RadiationComponent(value: directNorIrr, component: "Direct Normal Irradiance"),
+          RadiationComponent(value: diffRad, component: "Diffuse Radiation"),
+          RadiationComponent(value: cape, component: "CAPE"),
+        ])),
+      ])
+    ]);
+  }
+}
+
+class RadiationComponent extends StatelessWidget {
+  const RadiationComponent({Key? key, required this.value, required this.component, this.bar = true}) : super(key: key);
+  final num value;
+  final String component;
+  final bool bar;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+      if (bar) const Divider(color: Colors.white, height: 8),
+      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, crossAxisAlignment: CrossAxisAlignment.center, children: [
+        Expanded(child: Text(component, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 16, height: 1.2))),
+        const SizedBox(width: 12),
+        Text('$value%', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 15, height: 1.2))
+      ])
+    ]);
+  }
+}
+
 class SunLine extends StatelessWidget {
   const SunLine({Key? key, required this.status, required this.size, required this.value}) : super(key: key);
   final String status;
@@ -378,10 +485,8 @@ class SunLine extends StatelessWidget {
         const Spacer(flex: 3),
         const Align(alignment: Alignment.center, child: Text("04:12 AM", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 17), textAlign: TextAlign.center)),
         const Spacer(),
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text("Sunset", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1.5)),
-          Text(status, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 22, height: 1))
-        ])
+        Column(
+            crossAxisAlignment: CrossAxisAlignment.start, children: [const Text("Sunset", style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1.5)), Text(status, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 22, height: 1))])
       ]),
       SizedBox(
           height: 132,
@@ -431,10 +536,7 @@ class TemperaturePill extends StatelessWidget {
                         gradient: selected
                             ? null
                             : LinearGradient(
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                                colors: [const Color(0xff48319D).withOpacity(.1), const Color(0xff48319D).withOpacity(.2), const Color(0xff48319D).withOpacity(.2), const Color(0xff48319D).withOpacity(.3)],
-                                stops: const [0.1, 0.2, 0.8, 0.9]),
+                                begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [const Color(0xff48319D).withOpacity(.1), const Color(0xff48319D).withOpacity(.2), const Color(0xff48319D).withOpacity(.2), const Color(0xff48319D).withOpacity(.3)], stops: const [0.1, 0.2, 0.8, 0.9]),
                         boxShadow: [BoxShadow(color: const Color(0xff000000).withOpacity(.25), offset: const Offset(0, 10), spreadRadius: 0, blurRadius: 8)]),
                     child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                       Text(dateOrTime, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 17)),
@@ -445,9 +547,7 @@ class TemperaturePill extends StatelessWidget {
 }
 
 class CurrentWeather extends StatelessWidget {
-  const CurrentWeather(
-      {Key? key, required this.location, required this.weather, required this.temp, required this.maxTemp, required this.minTemp, required this.country, required this.time, required this.address})
-      : super(key: key);
+  const CurrentWeather({Key? key, required this.location, required this.weather, required this.temp, required this.maxTemp, required this.minTemp, required this.country, required this.time, required this.address}) : super(key: key);
   final String location;
   final String country;
   final String address;
@@ -462,27 +562,18 @@ class CurrentWeather extends StatelessWidget {
     return Container(
         decoration: const BoxDecoration(color: Color(0xff2D3259)),
         child: Container(
-            decoration:
-                BoxDecoration(gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [const Color(0xff2E335A).withOpacity(.05), const Color(0xff1C1B33).withOpacity(.75)])),
+            decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [const Color(0xff2E335A).withOpacity(.05), const Color(0xff1C1B33).withOpacity(.75)])),
             child: Stack(alignment: Alignment.bottomCenter, children: [
               Opacity(
                   opacity: .5,
-                  child: SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height,
-                      child: FadeInImage.assetNetwork(placeholder: "assets/background.png", image: "https://source.unsplash.com/random/?${Uri.encodeFull('$country ${Random(1)}')}", fit: BoxFit.cover))),
-              Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black.withOpacity(.25), Colors.black.withOpacity(0)]))),
+                  child: SizedBox(width: MediaQuery.of(context).size.width, height: MediaQuery.of(context).size.height, child: FadeInImage.assetNetwork(placeholder: "assets/background.png", image: "https://source.unsplash.com/random/?${Uri.encodeFull('$country ${Random(1)}')}", fit: BoxFit.cover))),
+              Container(width: MediaQuery.of(context).size.width, height: MediaQuery.of(context).size.height, decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black.withOpacity(.25), Colors.black.withOpacity(0)]))),
               Column(children: [
                 AppBar(backgroundColor: Colors.transparent),
                 const Spacer(),
                 Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: CurrentTemp(location: location, weather: weather, temp: temp, maxTemp: maxTemp, minTemp: minTemp)),
                 Text("Last Updated on $time", style: TextStyle(color: Colors.white.withOpacity(.75), height: 2.5, fontWeight: FontWeight.w300, fontSize: 12)),
-                Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Text(address, style: TextStyle(color: Colors.white.withOpacity(.75), height: 1, fontWeight: FontWeight.w300, fontSize: 12), textAlign: TextAlign.center)),
+                Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: Text(address, style: TextStyle(color: Colors.white.withOpacity(.75), height: 1, fontWeight: FontWeight.w300, fontSize: 12), textAlign: TextAlign.center)),
                 const Spacer(flex: 10)
               ])
             ])));
@@ -490,9 +581,7 @@ class CurrentWeather extends StatelessWidget {
 }
 
 class WeatherDetailPanel extends StatelessWidget {
-  const WeatherDetailPanel(
-      {Key? key, required this.onPanelCloseTap, required this.children, required this.hourly, required this.weekly, required this.controller, required this.pController, required this.tabController})
-      : super(key: key);
+  const WeatherDetailPanel({Key? key, required this.onPanelCloseTap, required this.children, required this.hourly, required this.weekly, required this.controller, required this.pController, required this.tabController}) : super(key: key);
   final VoidCallback onPanelCloseTap;
   final List<Widget> children;
   final List<TemperaturePill> hourly;
@@ -509,20 +598,13 @@ class WeatherDetailPanel extends StatelessWidget {
           BackdropFilter(filter: ImageFilter.blur(tileMode: TileMode.repeated, sigmaX: 15, sigmaY: 15), child: Container(decoration: BoxDecoration(color: Colors.white.withOpacity(.1)))),
           Padding(
               padding: const EdgeInsets.only(top: 2.5),
-              child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
-                  child: BackdropFilter(
-                      filter: ImageFilter.blur(tileMode: TileMode.repeated, sigmaX: 15, sigmaY: 15), child: Container(decoration: BoxDecoration(color: const Color(0xff1b0f3b).withOpacity(.5)))))),
+              child: ClipRRect(borderRadius: const BorderRadius.vertical(top: Radius.circular(22)), child: BackdropFilter(filter: ImageFilter.blur(tileMode: TileMode.repeated, sigmaX: 15, sigmaY: 15), child: Container(decoration: BoxDecoration(color: const Color(0xff1b0f3b).withOpacity(.5)))))),
           Column(children: [
-            InkWell(
-                onTap: onPanelCloseTap,
-                child: Center(
-                    child: Container(margin: const EdgeInsets.symmetric(vertical: 16), width: 40, height: 5, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(12))))),
+            InkWell(onTap: onPanelCloseTap, child: Center(child: Container(margin: const EdgeInsets.symmetric(vertical: 16), width: 40, height: 5, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(12))))),
             Expanded(
                 child: ListView(controller: controller, shrinkWrap: true, padding: const EdgeInsets.only(bottom: 24), primary: false, children: [
               TabBar(
-                  indicator: UnderlineTabIndicator(
-                      borderSide: const BorderSide(strokeAlign: StrokeAlign.outside, width: 1, color: Colors.white), insets: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width / 3.5)),
+                  indicator: UnderlineTabIndicator(borderSide: const BorderSide(strokeAlign: StrokeAlign.outside, width: 1, color: Colors.white), insets: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width / 3.5)),
                   controller: tabController,
                   tabs: const [Padding(padding: EdgeInsets.only(bottom: 6), child: Text("Hourly")), Padding(padding: EdgeInsets.only(bottom: 6), child: Text("Weekly"))],
                   indicatorPadding: const EdgeInsets.all(24).copyWith(bottom: 0)),
