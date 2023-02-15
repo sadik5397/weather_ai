@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:weather_ai/components.dart';
 import 'package:weather_ai/views/locations.dart';
@@ -23,6 +25,7 @@ class _HomeState extends State<Home> {
   Map currentWeather = {}, todayWeather = {}, currentWeatherDetail = {}, weeklyWeather = {}, hourlyWeather = {};
   String location = "", country = "", address = "";
   List weeklyDayNames = [], weeklyAvgTemp = [], weeklyWeatherCode = [], hourlyTimes = [], hourlyTemp = [], hourlyWeatherCode = [];
+  bool locationInfoLoaded = false, currentWeatherLoaded = false, weatherWeeklyHourlyLoaded = false;
 
   //APIs
   Future<Position> getMyLocation() async {
@@ -43,15 +46,18 @@ class _HomeState extends State<Home> {
     var response = await http.get(Uri.parse("https://api.opencagedata.com/geocode/v1/json?key=0aabe27b107d496db971d4aa5acad6c0&q=$lat,$lng&limit=1&address_only=1&no_annotations=1"));
     Map result = jsonDecode(response.body);
     setState(() => address = '${result["results"][0]["formatted"]}');
-    setState(() => location = result["results"][0]["formatted"].toString().split(", ").length > 1 ? result["results"][0]["formatted"].toString().split(", ")[1] : result["results"][0]["formatted"].toString().split(", ")[0]);
+    setState(() => location =
+        result["results"][0]["formatted"].toString().split(", ").length > 1 ? result["results"][0]["formatted"].toString().split(", ")[1] : result["results"][0]["formatted"].toString().split(", ")[0]);
     setState(() => country = result["results"][0]["formatted"].toString().split(", ")[result["results"][0]["formatted"].toString().split(",").length - 1]);
+    setState(() => locationInfoLoaded = true);
   }
 
   Future<void> getCurrentWeather({required double lat, required double lng, required int currentHour, required String date}) async {
-    var response = await http.get(Uri.parse("https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lng&current_weather=true&temperature_unit=celsius&windspeed_unit=kmh&precipitation_unit=mm&timeformat=iso8601&timezone=auto&hourly=cloudcover,"
+    var response = await http.get(Uri.parse(
+        "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lng&current_weather=true&temperature_unit=celsius&windspeed_unit=kmh&precipitation_unit=mm&timeformat=iso8601&timezone=auto&hourly=cloudcover,"
         "relativehumidity_2m,dewpoint_2m,apparent_temperature,surface_pressure,cloudcover_high,cloudcover_mid,cloudcover_low,windspeed_10m,windspeed_80m,windspeed_120m,windspeed_180m,winddirection_10m,"
         "winddirection_80m,winddirection_120m,winddirection_180m,shortwave_radiation,direct_radiation,direct_normal_irradiance,diffuse_radiation,cape,evapotranspiration,precipitation,snowfall,rain,"
-        "showers,snow_depth,visibility,soil_temperature_0cm,soil_moisture_0_1cm,temperature_2m,weathercode&start_date=$date"
+        "vapor_pressure_deficit,showers,snow_depth,visibility,soil_temperature_0cm,soil_moisture_0_1cm,temperature_2m,weathercode&start_date=$date"
         "&end_date=$date&daily=temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,precipitation_sum,precipitation_hours,weathercode,sunrise,sunset,"
         "shortwave_radiation_sum,rain_sum,showers_sum,snowfall_sum"));
     Map result = jsonDecode(response.body);
@@ -113,6 +119,7 @@ class _HomeState extends State<Home> {
           //Soil Temperature
           "soil_temperature_0cm": result["hourly"]["soil_temperature_0cm"][currentHour],
           "soil_moisture_0_1cm": result["hourly"]["soil_moisture_0_1cm"][currentHour],
+          "vapor_pressure_deficit": result["hourly"]["vapor_pressure_deficit"][currentHour],
 
           //Sun Time
           "sunrise": todayWeather["sunrise"] == null ? "" : todayWeather["sunrise"][0],
@@ -124,12 +131,14 @@ class _HomeState extends State<Home> {
           "snow_depth": result["hourly"]["snow_depth"][currentHour],
           "visibility": result["hourly"]["visibility"][currentHour],
         });
+    setState(() => currentWeatherLoaded = true);
   }
 
   Future<void> getHourlyAndWeekly({required double lat, required double lng}) async {
     List temp = [];
-    var response = await http.get(Uri.parse("https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lng&temperature_unit=celsius&windspeed_unit=kmh&precipitation_unit=mm&timeformat=iso8601&timezone=auto&past_days=2&daily"
-        "=temperature_2m_max,temperature_2m_min,weathercode&hourly=temperature_2m,weathercode"));
+    var response = await http
+        .get(Uri.parse("https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lng&temperature_unit=celsius&windspeed_unit=kmh&precipitation_unit=mm&timeformat=iso8601&timezone=auto&past_days=2&daily"
+            "=temperature_2m_max,temperature_2m_min,weathercode&hourly=temperature_2m,weathercode"));
     Map result = jsonDecode(response.body);
     Map hourly = result["hourly"];
     temp = [];
@@ -163,6 +172,7 @@ class _HomeState extends State<Home> {
       temp.add(daily["weathercode"][i]);
     }
     setState(() => weeklyWeatherCode = temp);
+    setState(() => weatherWeeklyHourlyLoaded = true);
   }
 
   //Functions
@@ -188,39 +198,44 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        endDrawer: const Locations(),
+        endDrawer: kDebugMode ? const Locations() : null,
         backgroundColor: const Color(0xff2D3259),
-        body: SlidingUpPanel(
-            parallaxEnabled: true,
-            color: Colors.transparent,
-            boxShadow: null,
-            controller: pController,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-            maxHeight: MediaQuery.of(context).size.height - 100,
-            minHeight: 260,
-            parallaxOffset: 0.25,
-            onPanelSlide: (position) => setState(() => panelPosition = position),
-            body: CurrentWeather(
-                location: location,
-                country: country,
-                address: address,
-                time: currentWeather["time"].toString().replaceAll("T", " at "),
-                weather: currentWeather.isEmpty ? "Loading..." : weatherCodeToStatus(currentWeather["weathercode"]),
-                temp: currentWeather["temperature"] ?? 0,
-                maxTemp: todayWeather["temperature_2m_max"] == null ? 0 : todayWeather["temperature_2m_max"][0],
-                minTemp: todayWeather["temperature_2m_min"] == null ? 0 : todayWeather["temperature_2m_min"][0]),
-            panelBuilder: (controller) => WeatherDetail(
-                controller: controller,
-                pController: pController,
-                latitude: latitude,
-                longitude: longitude,
-                altitude: altitude,
-                hourlyTimes: hourlyTimes,
-                hourlyTemp: hourlyTemp,
-                hourlyWeatherCode: hourlyWeatherCode,
-                weeklyDayNames: weeklyDayNames,
-                weeklyAvgTemp: weeklyAvgTemp,
-                weeklyWeatherCode: weeklyWeatherCode,
-                weatherDetails: currentWeatherDetail)));
+        body: currentWeatherLoaded
+            ? SlidingUpPanel(
+                parallaxEnabled: true,
+                color: Colors.transparent,
+                boxShadow: null,
+                controller: pController,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                maxHeight: MediaQuery.of(context).size.height - 100,
+                minHeight: 260,
+                parallaxOffset: 0.25,
+                onPanelSlide: (position) => setState(() => panelPosition = position),
+                body: CurrentWeather(
+                    location: location,
+                    country: country,
+                    address: address,
+                    time: currentWeather["time"].toString().replaceAll("T", " at "),
+                    weather: currentWeather.isEmpty ? "Loading..." : weatherCodeToStatus(currentWeather["weathercode"]),
+                    temp: currentWeather["temperature"] ?? 0,
+                    maxTemp: todayWeather["temperature_2m_max"] == null ? 0 : todayWeather["temperature_2m_max"][0],
+                    minTemp: todayWeather["temperature_2m_min"] == null ? 0 : todayWeather["temperature_2m_min"][0]),
+                panelBuilder: (controller) => WeatherDetail(
+                    weatherWeeklyHourlyLoaded: weatherWeeklyHourlyLoaded,
+                    time: currentWeather["time"].toString().replaceAll("T", " at "),
+                    controller: controller,
+                    pController: pController,
+                    latitude: latitude,
+                    longitude: longitude,
+                    altitude: altitude,
+                    hourlyTimes: hourlyTimes,
+                    hourlyTemp: hourlyTemp,
+                    hourlyWeatherCode: hourlyWeatherCode,
+                    weeklyDayNames: weeklyDayNames,
+                    weeklyAvgTemp: weeklyAvgTemp,
+                    weeklyWeatherCode: weeklyWeatherCode,
+                    weatherDetails: currentWeatherDetail))
+            // : Center(child: Lottie.asset("assets/loading.json", width: 200)));
+            : Center(child: Lottie.asset("assets/sun.json", width: 200)));
   }
 }

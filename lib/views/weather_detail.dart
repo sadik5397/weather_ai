@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import '../components.dart';
@@ -17,13 +16,17 @@ class WeatherDetail extends StatefulWidget {
       required this.hourlyTimes,
       required this.hourlyTemp,
       required this.hourlyWeatherCode,
-      required this.weatherDetails})
+      required this.time,
+      required this.weatherDetails,
+      required this.weatherWeeklyHourlyLoaded})
       : super(key: key);
   final ScrollController controller;
   final PanelController pController;
   final double latitude;
   final double longitude;
   final double altitude;
+  final bool weatherWeeklyHourlyLoaded;
+  final String time;
   final List weeklyDayNames;
   final List weeklyAvgTemp;
   final List weeklyWeatherCode;
@@ -40,12 +43,8 @@ class _WeatherDetailState extends State<WeatherDetail> with SingleTickerProvider
   //variables
   late TabController tabController;
 
-  //API
-
   //Functions
   togglePanel() => widget.pController.isPanelOpen ? widget.pController.close() : widget.pController.open();
-
-  Future defaultInit() async {}
 
   //Initiate
   @override
@@ -58,17 +57,30 @@ class _WeatherDetailState extends State<WeatherDetail> with SingleTickerProvider
   Widget build(BuildContext context) {
     return WeatherDetailPanel(
         onPanelCloseTap: togglePanel,
-        hourly: List.generate(widget.hourlyTimes.isEmpty ? 0 : 24, (index) => TemperaturePill(selected: index == DateTime.now().hour, dateOrTime: hrToHour(int.parse(widget.hourlyTimes[index])), weatherCode: widget.hourlyWeatherCode[index], avgTemp: widget.hourlyTemp[index])),
-        weekly: List.generate(widget.weeklyDayNames.length, (index) => TemperaturePill(selected: index == 3, dateOrTime: widget.weeklyDayNames[index], weatherCode: widget.weeklyWeatherCode[index], avgTemp: widget.weeklyAvgTemp[index])),
+        hourly: List.generate(
+            24,
+            (index) => widget.weatherWeeklyHourlyLoaded
+                ? TemperaturePill(
+                    selected: index == DateTime.now().hour, dateOrTime: hrToHour(int.parse(widget.hourlyTimes[index])), weatherCode: widget.hourlyWeatherCode[index], avgTemp: widget.hourlyTemp[index])
+                : const TemperaturePillBlank()),
+        weekly: List.generate(
+            9,
+            (index) => widget.weatherWeeklyHourlyLoaded
+                ? TemperaturePill(selected: index == 3, dateOrTime: widget.weeklyDayNames[index], weatherCode: widget.weeklyWeatherCode[index], avgTemp: widget.weeklyAvgTemp[index])
+                : const TemperaturePillBlank()),
         controller: widget.controller,
         pController: widget.pController,
         tabController: tabController,
         children: [
-          if (kDebugMode) SelectableText(widget.weatherDetails.toString().replaceAll("{", "").replaceAll("}", "").replaceAll(", ", "\n")),
+          // if (kDebugMode) SelectableText(widget.weatherDetails.toString().replaceAll("{", "").replaceAll("}", "").replaceAll(", ", "\n")),
           PaddedRow(children: [AirQuality(value: widget.weatherDetails["aq_index"], components: widget.weatherDetails["aqi_components"])]),
           PaddedRow(children: [
             Humidity(hum: widget.weatherDetails["relativehumidity_2m"], dewPoint: widget.weatherDetails["dewpoint_2m"]),
-            FeelsLike(temp: widget.weatherDetails["actual_temperature"], current: widget.weatherDetails["apparent_temperature"], max: widget.weatherDetails["apparent_temperature_max"], min: widget.weatherDetails["apparent_temperature_min"])
+            FeelsLike(
+                temp: widget.weatherDetails["actual_temperature"],
+                current: widget.weatherDetails["apparent_temperature"],
+                max: widget.weatherDetails["apparent_temperature_max"],
+                min: widget.weatherDetails["apparent_temperature_min"])
           ]),
           PaddedRow(children: [
             WindSpeed(
@@ -85,8 +97,13 @@ class _WeatherDetailState extends State<WeatherDetail> with SingleTickerProvider
           ]),
           PaddedRow(children: [
             Column(children: [
-              CloudCover(value: widget.weatherDetails["cloudcover"], low: widget.weatherDetails["cloudcover_low"], mid: widget.weatherDetails["cloudcover_mid"], high: widget.weatherDetails["cloudcover_high"], screenSize: MediaQuery.of(context).size),
-              SoilTemperature(temp: widget.weatherDetails["soil_temperature_0cm"], moist: widget.weatherDetails["soil_moisture_0_1cm"], screenSize: MediaQuery.of(context).size)
+              CloudCover(
+                  value: widget.weatherDetails["cloudcover"],
+                  low: widget.weatherDetails["cloudcover_low"],
+                  mid: widget.weatherDetails["cloudcover_mid"],
+                  high: widget.weatherDetails["cloudcover_high"],
+                  screenSize: MediaQuery.of(context).size),
+              VisibilityDistance(value: widget.weatherDetails["visibility"], screenSize: MediaQuery.of(context).size)
             ]),
             Precipitation(
                 value: widget.weatherDetails["precipitation"],
@@ -106,7 +123,17 @@ class _WeatherDetailState extends State<WeatherDetail> with SingleTickerProvider
                 directNorIrr: widget.weatherDetails["direct_normal_irradiance"],
                 diffRad: widget.weatherDetails["diffuse_radiation"],
                 cape: widget.weatherDetails["cape"])
-          ])
+          ]),
+          PaddedRow(children: [
+            SoilTemperature(
+                vapor: widget.weatherDetails["vapor_pressure_deficit"],
+                temp: widget.weatherDetails["soil_temperature_0cm"],
+                moist: widget.weatherDetails["soil_moisture_0_1cm"],
+                screenSize: MediaQuery.of(context).size),
+            SunLine(sunrise: widget.weatherDetails["sunrise"], size: MediaQuery.of(context).size, sunset: widget.weatherDetails["sunset"])
+          ]),
+          Others(evapotranspiration: widget.weatherDetails["evapotranspiration"], surfacePressure: widget.weatherDetails["surface_pressure"], snowDepth: widget.weatherDetails["snow_depth"]),
+          Footer(time: widget.time)
         ]);
   }
 }

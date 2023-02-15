@@ -44,6 +44,7 @@ dependencies:
   shared_preferences:
   geolocator: ^9.0.2
   intl: ^0.18.0
+  lottie: ^2.2.0
 
 dev_dependencies:
   flutter_test:
