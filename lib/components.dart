@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:math';
 import 'dart:ui';
 import 'package:flutter/material.dart';
@@ -78,7 +80,9 @@ String toolTip(String title) {
     return "Visibility is a measure of the horizontal opacity of the atmosphere at the point of observation and is expressed in terms of the horizontal distance at which a person should be able to see and identify";
   }
   if (title == "Shortwave Solar Radiation") return "Shortwave solar radiation as average of the preceding hour. This is equal to the total global horizontal irradiation";
-  if (title == "Soil Temp.") return "Average temperature of different soil levels below ground (0-7cm depths) and Average soil water content as volumetric mixing ratio at 0-7cm depths.";
+  if (title == "Soil Temp.")
+    // ignore: curly_braces_in_flow_control_structures
+    return "Average temperature of different soil levels below ground (0-7cm depths) and Average soil water content as volumetric mixing ratio at 0-7cm depths.";
   if (title == "Sun") return "Sun rise and set times of current day";
   if (title == "Evapotranspiration") return "ET₀ Reference Evapotranspiration of a well watered grass field. Based on FAO-56 Penman-Monteith equations";
   if (title == "Surface Pressure") {
@@ -132,7 +136,9 @@ class ContainerBox extends StatelessWidget {
           width: width == null ? null : width! - 16,
           height: height == null ? 190 : height! - 16,
           decoration: BoxDecoration(
-              color: const Color(0xff2D2258).withOpacity(.5), borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.white.withOpacity(.2), width: 1, strokeAlign: StrokeAlign.inside)),
+              color: const Color(0xff2D2258).withOpacity(.5),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withOpacity(.2), width: 1, strokeAlign: BorderSide.strokeAlignOutside)),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: children)),
     ));
   }
@@ -148,8 +154,9 @@ class ColorfulIndicatorBar extends StatelessWidget {
     return Stack(alignment: Alignment.center, children: [
       Container(
           height: 6,
-          decoration:
-              BoxDecoration(borderRadius: BorderRadius.circular(12), gradient: const LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [Color(0xff3759B1), Color(0xffE74395)]))),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              gradient: const LinearGradient(begin: Alignment.centerLeft, end: Alignment.centerRight, colors: [Color(0xff3759B1), Color(0xffE74395)]))),
       Row(children: [Spacer(flex: value + 1), const CircleAvatar(radius: 7, backgroundColor: Colors.white), Spacer(flex: maxValue - value + 1)])
     ]);
   }
@@ -191,10 +198,11 @@ class LocationTile extends StatelessWidget {
                       Text("Time - $time", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w400, fontSize: 17)),
                       Text(location, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 17, height: 1))
                     ]),
-                    Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [const FlutterLogo(size: 94), const SizedBox(height: 16), Text(weather, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 17, height: 1))])
+                    Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.end, children: [
+                      const FlutterLogo(size: 94),
+                      const SizedBox(height: 16),
+                      Text(weather, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 17, height: 1))
+                    ])
                   ]))
             ])));
   }
@@ -256,7 +264,15 @@ class AirComponents extends StatelessWidget {
 
 class Precipitation extends StatelessWidget {
   const Precipitation(
-      {Key? key, required this.value, required this.valueSum, required this.snowfall, required this.snowfallSum, required this.rain, required this.rainSum, required this.shower, required this.showerSum})
+      {Key? key,
+      required this.value,
+      required this.valueSum,
+      required this.snowfall,
+      required this.snowfallSum,
+      required this.rain,
+      required this.rainSum,
+      required this.shower,
+      required this.showerSum})
       : super(key: key);
   final num? value, valueSum, snowfall, snowfallSum, rain, rainSum, shower, showerSum;
 
@@ -473,7 +489,8 @@ class WindSpeed extends StatelessWidget {
           Container(
               margin: const EdgeInsets.only(left: 6),
               height: 120,
-              decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.white.withOpacity(0), Colors.white.withOpacity(.1)]))),
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.white.withOpacity(0), Colors.white.withOpacity(.1)]))),
           Column(
               children: [
             WindSpeedAtHeight(height: 0, speed: value0, direction: direction0),
@@ -513,8 +530,13 @@ class Others extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PaddedRow(children: [
-      ContainerBox(horizontalPadding: 12, height: 168, tooltipInfo: toolTip("Evapotranspiration"), children: [OthersComponents(component: "Evapotrans\npiration", value: evapotranspiration)]),
-      ContainerBox(horizontalPadding: 12, height: 168, tooltipInfo: toolTip("Surface Pressure"), children: [OthersComponents(component: "Surface\n Pressure", value: surfacePressure)]),
+      ContainerBox(
+          horizontalPadding: 12,
+          height: 168,
+          tooltipInfo: toolTip("Evapotranspiration"),
+          children: [OthersComponents(component: "Evapotrans\npiration", value: evapotranspiration)]),
+      ContainerBox(
+          horizontalPadding: 12, height: 168, tooltipInfo: toolTip("Surface Pressure"), children: [OthersComponents(component: "Surface\n Pressure", value: surfacePressure)]),
       ContainerBox(horizontalPadding: 12, height: 168, tooltipInfo: toolTip("Snow Depth"), children: [OthersComponents(component: "Snow\n Depth", value: snowDepth)]),
     ]);
   }
@@ -541,7 +563,9 @@ class OthersComponents extends StatelessWidget {
 }
 
 class SolarRadiation extends StatelessWidget {
-  const SolarRadiation({Key? key, required this.shortWaveRad, required this.shortWaveRadSum, required this.directRad, required this.directNorIrr, required this.diffRad, required this.cape}) : super(key: key);
+  const SolarRadiation(
+      {Key? key, required this.shortWaveRad, required this.shortWaveRadSum, required this.directRad, required this.directNorIrr, required this.diffRad, required this.cape})
+      : super(key: key);
   final num shortWaveRad, shortWaveRadSum, directRad, directNorIrr, diffRad, cape;
 
   @override
@@ -611,12 +635,15 @@ class SunLine extends StatelessWidget {
 
     return Stack(alignment: Alignment.bottomCenter, children: [
       ContainerBox(tooltipInfo: toolTip("Sun"), height: 190 + 16, width: size.width / 2 - 14, children: [
-        Text(nowBetweenSunrise > const Duration(milliseconds: 0) ? "Sunset" : "Sunrise", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
+        Text(nowBetweenSunrise > const Duration(milliseconds: 0) ? "Sunset" : "Sunrise",
+            style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17)),
         const Spacer(flex: 3),
         Align(
             alignment: Alignment.center,
-            child: Text(nowBetweenSunrise > const Duration(milliseconds: 0) ? DateFormat('hh:mm a').format(DateTime.parse(sunset)) : DateFormat('hh:mm a').format(DateTime.parse(sunrise)),
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 17), textAlign: TextAlign.center)),
+            child: Text(
+                nowBetweenSunrise > const Duration(milliseconds: 0) ? DateFormat('hh:mm a').format(DateTime.parse(sunset)) : DateFormat('hh:mm a').format(DateTime.parse(sunrise)),
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w300, fontSize: 17),
+                textAlign: TextAlign.center)),
         const Spacer(),
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(nowBetweenSunset > const Duration(milliseconds: 0) ? "Next Sunset" : "Next Sunrise",
@@ -628,21 +655,24 @@ class SunLine extends StatelessWidget {
       SizedBox(
           height: 132,
           width: size.width / 2 - 32,
-          child: AnimatedRadialGauge(
-              alignment: Alignment.topCenter,
-              duration: const Duration(seconds: 3),
-              curve: Curves.elasticOut,
-              value: 0,
-              progressBar: const GaugeRoundedProgressBar(color: Colors.transparent),
-              axis: GaugeAxis(
-                  segments: nowBetweenSunrise > const Duration(milliseconds: 0)
-                      ? [GaugeSegment(from: nowBetweenSunriseInSecond.toDouble(), to: nowBetweenSunriseInSecond + (sunriseBetweenSunsetInSecond / 24), color: Colors.white)]
-                      : [GaugeSegment(from: nowBetweenSunsetInSecond.toDouble(), to: nowBetweenSunsetInSecond + (sunriseBetweenSunsetInSecond / 24), color: Colors.white)],
-                  min: 0,
-                  max: sunriseBetweenSunsetInSecond.toDouble() + (sunriseBetweenSunsetInSecond / 24),
-                  degrees: 120,
-                  style: GaugeAxisStyle(thickness: 6, background: Colors.white.withOpacity(.2)),
-                  pointer: NeedlePointer(size: const Size(16, 100), borderRadius: 16, backgroundColor: Colors.transparent))))
+          child:
+          SizedBox()
+          // AnimatedRadialGauge(
+          //     alignment: Alignment.topCenter,
+          //     duration: const Duration(seconds: 3),
+          //     curve: Curves.elasticOut,
+          //     value: 0,
+          //     progressBar: const GaugeRoundedProgressBar(color: Colors.transparent),
+          //     axis: GaugeAxis(
+          //         segments: nowBetweenSunrise > const Duration(milliseconds: 0)
+          //             ? [GaugeSegment(from: nowBetweenSunriseInSecond.toDouble(), to: nowBetweenSunriseInSecond + (sunriseBetweenSunsetInSecond / 24), color: Colors.white)]
+          //             : [GaugeSegment(from: nowBetweenSunsetInSecond.toDouble(), to: nowBetweenSunsetInSecond + (sunriseBetweenSunsetInSecond / 24), color: Colors.white)],
+          //         min: 0,
+          //         max: sunriseBetweenSunsetInSecond.toDouble() + (sunriseBetweenSunsetInSecond / 24),
+          //         degrees: 120,
+          //         style: GaugeAxisStyle(thickness: 6, background: Colors.white.withOpacity(.2)),
+          //         pointer: NeedlePointer(size: const Size(16, 100), borderRadius: 16, backgroundColor: Colors.transparent)))
+      )
     ]);
   }
 }
@@ -666,14 +696,20 @@ class TemperaturePill extends StatelessWidget {
             decoration: BoxDecoration(
                 color: const Color(0xff48319D),
                 borderRadius: BorderRadius.circular(40),
-                border: Border.all(color: Colors.white.withOpacity(.2), width: 1, strokeAlign: StrokeAlign.inside),
+                border: Border.all(color: Colors.white.withOpacity(.2), width: 1, strokeAlign: BorderSide.strokeAlignOutside),
                 gradient: selected
                     ? null
-                    : LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [const Color(0xff48319D).withOpacity(.1), const Color(0xff48319D).withOpacity(.2), const Color(0xff48319D).withOpacity(.2), const Color(0xff48319D).withOpacity(.3)],
-                        stops: const [0.1, 0.2, 0.8, 0.9]),
+                    : LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [
+                        const Color(0xff48319D).withOpacity(.1),
+                        const Color(0xff48319D).withOpacity(.2),
+                        const Color(0xff48319D).withOpacity(.2),
+                        const Color(0xff48319D).withOpacity(.3)
+                      ], stops: const [
+                        0.1,
+                        0.2,
+                        0.8,
+                        0.9
+                      ]),
                 boxShadow: [BoxShadow(color: const Color(0xff000000).withOpacity(.25), offset: const Offset(0, 10), spreadRadius: 0, blurRadius: 8)]),
             child: Column(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text(dateOrTime, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 17)),
@@ -697,12 +733,18 @@ class TemperaturePillBlank extends StatelessWidget {
         decoration: BoxDecoration(
             color: const Color(0xff48319D),
             borderRadius: BorderRadius.circular(40),
-            border: Border.all(color: Colors.white.withOpacity(.2), width: 1, strokeAlign: StrokeAlign.inside),
-            gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [const Color(0xff48319D).withOpacity(.1), const Color(0xff48319D).withOpacity(.2), const Color(0xff48319D).withOpacity(.2), const Color(0xff48319D).withOpacity(.3)],
-                stops: const [0.1, 0.2, 0.8, 0.9]),
+            border: Border.all(color: Colors.white.withOpacity(.2), width: 1, strokeAlign: BorderSide.strokeAlignOutside),
+            gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [
+              const Color(0xff48319D).withOpacity(.1),
+              const Color(0xff48319D).withOpacity(.2),
+              const Color(0xff48319D).withOpacity(.2),
+              const Color(0xff48319D).withOpacity(.3)
+            ], stops: const [
+              0.1,
+              0.2,
+              0.8,
+              0.9
+            ]),
             boxShadow: [BoxShadow(color: const Color(0xff000000).withOpacity(.25), offset: const Offset(0, 10), spreadRadius: 0, blurRadius: 8)]),
         child: const CircularProgressIndicator());
   }
@@ -710,7 +752,15 @@ class TemperaturePillBlank extends StatelessWidget {
 
 class CurrentWeather extends StatelessWidget {
   const CurrentWeather(
-      {Key? key, required this.location, required this.weather, required this.temp, required this.maxTemp, required this.minTemp, required this.country, required this.time, required this.address})
+      {Key? key,
+      required this.location,
+      required this.weather,
+      required this.temp,
+      required this.maxTemp,
+      required this.minTemp,
+      required this.country,
+      required this.time,
+      required this.address})
       : super(key: key);
   final String location;
   final String country;
@@ -726,27 +776,32 @@ class CurrentWeather extends StatelessWidget {
     return Container(
         decoration: const BoxDecoration(color: Color(0xff2D3259)),
         child: Container(
-            decoration:
-                BoxDecoration(gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [const Color(0xff2E335A).withOpacity(.05), const Color(0xff1C1B33).withOpacity(.75)])),
+            decoration: BoxDecoration(
+                gradient: LinearGradient(
+                    begin: Alignment.topRight, end: Alignment.bottomLeft, colors: [const Color(0xff2E335A).withOpacity(.05), const Color(0xff1C1B33).withOpacity(.75)])),
             child: Stack(alignment: Alignment.bottomCenter, children: [
               Opacity(
                   opacity: .5,
                   child: SizedBox(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
-                      child: FadeInImage.assetNetwork(placeholder: "assets/background.png", image: "https://source.unsplash.com/random/?${Uri.encodeFull('$country ${Random(1)}')}", fit: BoxFit.cover))),
+                      child: FadeInImage.assetNetwork(
+                          placeholder: "assets/background.png", image: "https://source.unsplash.com/random/?${Uri.encodeFull('$country ${Random(1)}')}", fit: BoxFit.cover))),
               Container(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
-                  decoration: BoxDecoration(gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black.withOpacity(.25), Colors.black.withOpacity(0)]))),
+                  decoration: BoxDecoration(
+                      gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.black.withOpacity(.25), Colors.black.withOpacity(0)]))),
               Column(children: [
                 AppBar(backgroundColor: Colors.transparent),
                 const Spacer(),
-                Padding(padding: const EdgeInsets.symmetric(horizontal: 12), child: CurrentTemp(location: location, weather: weather, temp: temp, maxTemp: maxTemp, minTemp: minTemp)),
+                Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12), child: CurrentTemp(location: location, weather: weather, temp: temp, maxTemp: maxTemp, minTemp: minTemp)),
                 Text("Last Updated on $time", style: TextStyle(color: Colors.white.withOpacity(.75), height: 2.5, fontWeight: FontWeight.w300, fontSize: 12)),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Text(address, style: TextStyle(color: Colors.white.withOpacity(.75), height: 1, fontWeight: FontWeight.w300, fontSize: 12), textAlign: TextAlign.center)),
+                    child:
+                        Text(address, style: TextStyle(color: Colors.white.withOpacity(.75), height: 1, fontWeight: FontWeight.w300, fontSize: 12), textAlign: TextAlign.center)),
                 const Spacer(flex: 10)
               ])
             ])));
@@ -755,7 +810,14 @@ class CurrentWeather extends StatelessWidget {
 
 class WeatherDetailPanel extends StatelessWidget {
   const WeatherDetailPanel(
-      {Key? key, required this.onPanelCloseTap, required this.children, required this.hourly, required this.weekly, required this.controller, required this.pController, required this.tabController})
+      {Key? key,
+      required this.onPanelCloseTap,
+      required this.children,
+      required this.hourly,
+      required this.weekly,
+      required this.controller,
+      required this.pController,
+      required this.tabController})
       : super(key: key);
   final VoidCallback onPanelCloseTap;
   final List<Widget> children;
@@ -770,23 +832,30 @@ class WeatherDetailPanel extends StatelessWidget {
     return ClipRRect(
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         child: Stack(fit: StackFit.expand, children: [
-          BackdropFilter(filter: ImageFilter.blur(tileMode: TileMode.repeated, sigmaX: 15, sigmaY: 15), child: Container(decoration: BoxDecoration(color: Colors.white.withOpacity(.1)))),
+          BackdropFilter(
+              filter: ImageFilter.blur(tileMode: TileMode.repeated, sigmaX: 15, sigmaY: 15), child: Container(decoration: BoxDecoration(color: Colors.white.withOpacity(.1)))),
           Padding(
               padding: const EdgeInsets.only(top: 2.5),
               child: ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(22)),
                   child: BackdropFilter(
-                      filter: ImageFilter.blur(tileMode: TileMode.repeated, sigmaX: 15, sigmaY: 15), child: Container(decoration: BoxDecoration(color: const Color(0xff1b0f3b).withOpacity(.5)))))),
+                      filter: ImageFilter.blur(tileMode: TileMode.repeated, sigmaX: 15, sigmaY: 15),
+                      child: Container(decoration: BoxDecoration(color: const Color(0xff1b0f3b).withOpacity(.5)))))),
           Column(children: [
             InkWell(
                 onTap: onPanelCloseTap,
                 child: Center(
-                    child: Container(margin: const EdgeInsets.symmetric(vertical: 16), width: 40, height: 5, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(12))))),
+                    child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 16),
+                        width: 40,
+                        height: 5,
+                        decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(12))))),
             Expanded(
                 child: ListView(controller: controller, shrinkWrap: true, padding: const EdgeInsets.only(bottom: 24), primary: false, children: [
               TabBar(
                   indicator: UnderlineTabIndicator(
-                      borderSide: const BorderSide(strokeAlign: StrokeAlign.outside, width: 1, color: Colors.white), insets: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width / 3.5)),
+                      borderSide: const BorderSide(strokeAlign: BorderSide.strokeAlignOutside, width: 1, color: Colors.white),
+                      insets: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width / 3.5)),
                   controller: tabController,
                   tabs: const [Padding(padding: EdgeInsets.only(bottom: 6), child: Text("Hourly")), Padding(padding: EdgeInsets.only(bottom: 6), child: Text("Weekly"))],
                   indicatorPadding: const EdgeInsets.all(24).copyWith(bottom: 0)),
@@ -795,13 +864,8 @@ class WeatherDetailPanel extends StatelessWidget {
                   child: TabBarView(controller: tabController, children: [
                     SingleChildScrollView(padding: const EdgeInsets.all(16).copyWith(bottom: 0), scrollDirection: Axis.horizontal, child: Row(children: hourly)),
                     SingleChildScrollView(padding: const EdgeInsets.all(16).copyWith(bottom: 0), scrollDirection: Axis.horizontal, child: Row(children: weekly)),
-                  ])),
-              ...children,
-            ]))
-          ])
-        ]));
-  }
-}
+                  ])),...children]))])]));
+}}
 
 class Footer extends StatelessWidget {
   const Footer({Key? key, required this.time}) : super(key: key);
@@ -812,7 +876,8 @@ class Footer extends StatelessWidget {
     return Column(children: [
       Padding(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Text("Last Updated on $time", style: TextStyle(color: Colors.white.withOpacity(.75), height: 2.5, fontWeight: FontWeight.w300, fontSize: 12), textAlign: TextAlign.center)),
+          child: Text("Last Updated on $time",
+              style: TextStyle(color: Colors.white.withOpacity(.75), height: 2.5, fontWeight: FontWeight.w300, fontSize: 12), textAlign: TextAlign.center)),
       Padding(padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(bottom: 12), child: Divider(height: 4, color: Colors.white.withOpacity(.5))),
       Text("Data Source", style: TextStyle(color: Colors.white.withOpacity(.6), fontWeight: FontWeight.w500, fontSize: 17), textAlign: TextAlign.center),
       const Padding(
@@ -824,7 +889,8 @@ class Footer extends StatelessWidget {
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 12, height: 1.5))),
       Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          child: Text("© weather.ai | created with ❤️ by S.a. Sadik", textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withOpacity(.75), fontWeight: FontWeight.w400, fontSize: 13, height: 1)))
+          child: Text("© weather.ai | created with ❤️ by S.a. Sadik",
+              textAlign: TextAlign.center, style: TextStyle(color: Colors.white.withOpacity(.75), fontWeight: FontWeight.w400, fontSize: 13, height: 1)))
     ]);
   }
 }
