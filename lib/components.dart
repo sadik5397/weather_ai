@@ -1,7 +1,5 @@
-// ignore_for_file: deprecated_member_use
-
-import 'dart:math';
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_svg/svg.dart';
@@ -628,9 +626,6 @@ class SunLine extends StatelessWidget {
   Widget build(BuildContext context) {
     Duration nowBetweenSunrise = DateTime.now().difference(DateTime.parse(sunrise));
     Duration nowBetweenSunset = DateTime.now().difference(DateTime.parse(sunset));
-    int sunriseBetweenSunsetInSecond = (DateTime.parse(sunrise).difference(DateTime.parse(sunset))).inSeconds.abs();
-    int nowBetweenSunriseInSecond = (DateTime.now().difference(DateTime.parse(sunrise))).inSeconds.abs();
-    int nowBetweenSunsetInSecond = (DateTime.now().difference(DateTime.parse(sunset))).inSeconds.abs();
 
     return Stack(alignment: Alignment.bottomCenter, children: [
       ContainerBox(tooltipInfo: toolTip("Sun"), height: 190 + 16, width: size.width / 2 - 14, children: [
@@ -651,11 +646,7 @@ class SunLine extends StatelessWidget {
               style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 22, height: 1))
         ])
       ]),
-      SizedBox(
-          height: 132,
-          width: size.width / 2 - 32,
-          child:
-          const SizedBox()
+      SizedBox(height: 132, width: size.width / 2 - 32, child: const SizedBox()
           // AnimatedRadialGauge(
           //     alignment: Alignment.topCenter,
           //     duration: const Duration(seconds: 3),
@@ -671,7 +662,7 @@ class SunLine extends StatelessWidget {
           //         degrees: 120,
           //         style: GaugeAxisStyle(thickness: 6, background: Colors.white.withOpacity(.2)),
           //         pointer: NeedlePointer(size: const Size(16, 100), borderRadius: 16, backgroundColor: Colors.transparent)))
-      )
+          )
     ]);
   }
 }
@@ -749,7 +740,7 @@ class TemperaturePillBlank extends StatelessWidget {
   }
 }
 
-class CurrentWeather extends StatelessWidget {
+class CurrentWeather extends StatefulWidget {
   const CurrentWeather(
       {Key? key,
       required this.location,
@@ -759,10 +750,12 @@ class CurrentWeather extends StatelessWidget {
       required this.minTemp,
       required this.country,
       required this.time,
-      required this.address})
+      required this.address,
+      required this.backgroundImage})
       : super(key: key);
   final String location;
   final String country;
+  final String backgroundImage;
   final String address;
   final String weather;
   final String time;
@@ -770,6 +763,11 @@ class CurrentWeather extends StatelessWidget {
   final double maxTemp;
   final double minTemp;
 
+  @override
+  State<CurrentWeather> createState() => _CurrentWeatherState();
+}
+
+class _CurrentWeatherState extends State<CurrentWeather> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -781,11 +779,15 @@ class CurrentWeather extends StatelessWidget {
             child: Stack(alignment: Alignment.bottomCenter, children: [
               Opacity(
                   opacity: .5,
-                  child: SizedBox(
+                  child: CachedNetworkImage(
+                      imageUrl: widget.backgroundImage,
+                      fit: BoxFit.cover,
+                      alignment: Alignment.center,
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
-                      child: FadeInImage.assetNetwork(
-                          placeholder: "assets/background.png", image: "https://source.unsplash.com/random/?${Uri.encodeFull('$country ${Random(1)}')}", fit: BoxFit.cover))),
+                      progressIndicatorBuilder: (context, url, downloadProgress) =>
+                          SizedBox(width: 14, height: 14, child: CircularProgressIndicator(value: downloadProgress.progress)),
+                      errorWidget: (context, url, error) => const Icon(Icons.error))),
               Container(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
@@ -795,12 +797,14 @@ class CurrentWeather extends StatelessWidget {
                 AppBar(backgroundColor: Colors.transparent),
                 const Spacer(),
                 Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12), child: CurrentTemp(location: location, weather: weather, temp: temp, maxTemp: maxTemp, minTemp: minTemp)),
-                Text("Last Updated on $time", style: TextStyle(color: Colors.white.withOpacity(.75), height: 2.5, fontWeight: FontWeight.w300, fontSize: 12)),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: CurrentTemp(location: widget.location, weather: widget.weather, temp: widget.temp, maxTemp: widget.maxTemp, minTemp: widget.minTemp)),
+                Text("Last Updated on ${widget.time}", style: TextStyle(color: Colors.white.withOpacity(.75), height: 2.5, fontWeight: FontWeight.w300, fontSize: 12)),
                 Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child:
-                        Text(address, style: TextStyle(color: Colors.white.withOpacity(.75), height: 1, fontWeight: FontWeight.w300, fontSize: 12), textAlign: TextAlign.center)),
+                    child: Text(widget.address,
+                        style: TextStyle(color: Colors.white.withOpacity(.75), height: 1, fontWeight: FontWeight.w300, fontSize: 12), textAlign: TextAlign.center)),
+                SelectableText(widget.backgroundImage),
                 const Spacer(flex: 10)
               ])
             ])));
@@ -863,8 +867,13 @@ class WeatherDetailPanel extends StatelessWidget {
                   child: TabBarView(controller: tabController, children: [
                     SingleChildScrollView(padding: const EdgeInsets.all(16).copyWith(bottom: 0), scrollDirection: Axis.horizontal, child: Row(children: hourly)),
                     SingleChildScrollView(padding: const EdgeInsets.all(16).copyWith(bottom: 0), scrollDirection: Axis.horizontal, child: Row(children: weekly)),
-                  ])),...children]))])]));
-}}
+                  ])),
+              ...children
+            ]))
+          ])
+        ]));
+  }
+}
 
 class Footer extends StatelessWidget {
   const Footer({Key? key, required this.time}) : super(key: key);

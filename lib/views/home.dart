@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -24,8 +25,9 @@ class _HomeState extends State<Home> {
   double panelPosition = 0, latitude = 0, longitude = 0, altitude = 0;
   Map currentWeather = {}, todayWeather = {}, currentWeatherDetail = {}, weeklyWeather = {}, hourlyWeather = {};
   String location = "", country = "", address = "";
+  String backgroundImage = "https://images.unsplash.com/photo-1561484930-974554019ade?ixlib=rb-4.0.3&q=85&fm=jpg&crop=entropy&cs=srgb&w=1920";
   List weeklyDayNames = [], weeklyAvgTemp = [], weeklyWeatherCode = [], hourlyTimes = [], hourlyTemp = [], hourlyWeatherCode = [];
-  bool locationInfoLoaded = false, currentWeatherLoaded = false, weatherWeeklyHourlyLoaded = false;
+  bool locationInfoLoaded = true, currentWeatherLoaded = true, weatherWeeklyHourlyLoaded = true;
 
   //APIs
   Future<Position> getMyLocation() async {
@@ -43,13 +45,37 @@ class _HomeState extends State<Home> {
   }
 
   Future<void> getLocation({required double lat, required double lng}) async {
-    var response = await http.get(Uri.parse("https://api.opencagedata.com/geocode/v1/json?key=0aabe27b107d496db971d4aa5acad6c0&q=$lat,$lng&limit=1&address_only=1&no_annotations=1"));
+    var response = await http.get(Uri.parse("https://api.opencagedata.com/geocode/v1/json?key=f7d33c1f314647ceb4f42a0eb96716b3&q=$lat,$lng&no_annotations=1"));
     Map result = jsonDecode(response.body);
+    print(result.toString());
+    //todo: handle error
     setState(() => address = '${result["results"][0]["formatted"]}');
-    setState(() => location =
-        result["results"][0]["formatted"].toString().split(", ").length > 1 ? result["results"][0]["formatted"].toString().split(", ")[1] : result["results"][0]["formatted"].toString().split(", ")[0]);
+    setState(() => location = result["results"][0]["formatted"].toString().split(", ").length > 1
+        ? result["results"][0]["formatted"].toString().split(", ")[1]
+        : result["results"][0]["formatted"].toString().split(", ")[0]);
     setState(() => country = result["results"][0]["formatted"].toString().split(", ")[result["results"][0]["formatted"].toString().split(",").length - 1]);
+    backgroundImage = await getPhotoUrlByKeyword(country) ?? backgroundImage;
     setState(() => locationInfoLoaded = true);
+  }
+
+  Future<String?> getPhotoUrlByKeyword(String keyword) async {
+    const String accessKey = 'og0hqA4X8sz-UlxvT_qszUhsdHLrnU1RwYplEIzycOM';
+    final url = Uri.parse('https://api.unsplash.com/photos/random/?query=$keyword&client_id=$accessKey&count=1');
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = jsonDecode(response.body);
+        String imageUrl = data[0]['urls']['raw'];
+        print('Found a Photo');
+        print(imageUrl);
+        return imageUrl;
+      } else {
+        print('Failed to fetch photo: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching photo: $e');
+    }
+    return null;
   }
 
   Future<void> getCurrentWeather({required double lat, required double lng, required int currentHour, required String date}) async {
@@ -136,9 +162,9 @@ class _HomeState extends State<Home> {
 
   Future<void> getHourlyAndWeekly({required double lat, required double lng}) async {
     List temp = [];
-    var response = await http
-        .get(Uri.parse("https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lng&temperature_unit=celsius&windspeed_unit=kmh&precipitation_unit=mm&timeformat=iso8601&timezone=auto&past_days=2&daily"
-            "=temperature_2m_max,temperature_2m_min,weathercode&hourly=temperature_2m,weathercode"));
+    var response = await http.get(Uri.parse(
+        "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lng&temperature_unit=celsius&windspeed_unit=kmh&precipitation_unit=mm&timeformat=iso8601&timezone=auto&past_days=2&daily"
+        "=temperature_2m_max,temperature_2m_min,weathercode&hourly=temperature_2m,weathercode"));
     Map result = jsonDecode(response.body);
     Map hourly = result["hourly"];
     temp = [];
@@ -212,6 +238,7 @@ class _HomeState extends State<Home> {
                 parallaxOffset: 0.25,
                 onPanelSlide: (position) => setState(() => panelPosition = position),
                 body: CurrentWeather(
+                    backgroundImage: backgroundImage,
                     location: location,
                     country: country,
                     address: address,
@@ -235,7 +262,6 @@ class _HomeState extends State<Home> {
                     weeklyAvgTemp: weeklyAvgTemp,
                     weeklyWeatherCode: weeklyWeatherCode,
                     weatherDetails: currentWeatherDetail))
-            // : Center(child: Lottie.asset("assets/loading.json", width: 200)));
-            : Center(child: Lottie.asset("assets/sun.json", width: 200)));
+            : Center(child: Lottie.asset("assets/loading.json", width: 200)));
   }
 }
