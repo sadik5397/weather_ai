@@ -5,7 +5,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_bounceable/flutter_bounceable.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:gauge_indicator/gauge_indicator.dart';
 import 'package:intl/intl.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 
@@ -656,7 +655,7 @@ class SunLine extends StatelessWidget {
           height: 132,
           width: size.width / 2 - 32,
           child:
-          SizedBox()
+          const SizedBox()
           // AnimatedRadialGauge(
           //     alignment: Alignment.topCenter,
           //     duration: const Duration(seconds: 3),
